@@ -15,19 +15,11 @@
  */
 package de.perdian.apps.imagetiger.fx;
 
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import javafx.scene.layout.BorderPane;
 
-import javafx.application.Application;
+class ImageTigerPane extends BorderPane {
 
-public class ImageTigerLauncher {
-
-    static {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
-    public static void main(String[] args) {
-        Application.launch(ImageTigerApplication.class, args);
+    ImageTigerPane(ImageTigerPreferences preferences) {
     }
 
 }
