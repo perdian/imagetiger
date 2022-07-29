@@ -15,39 +15,127 @@
  */
 package de.perdian.apps.imagetiger.fx;
 
-import java.io.IOException;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class ImageTigerPreferences {
 
     private static final Logger log = LoggerFactory.getLogger(ImageTigerPreferences.class);
 
-    private Path storageDirectory = null;
+    private Properties propertyValues = null;
+    private Path propertyValuesPath = null;
+    private Map<String, StringProperty> properties = null;
 
     public ImageTigerPreferences(Path storageDirectory) {
-        this.setStorageDirectory(storageDirectory);
-    }
+        Path propertyValuesFile = storageDirectory.resolve("property-values");
 
-    static ImageTigerPreferences createFromUserHome() throws IOException {
-        Path userHomePath = Path.of(System.getProperty("user.home"), ".imagetiger");
-        if (!Files.exists(userHomePath)) {
-            log.debug("Creating new preferences directory in user home: {}", userHomePath);
-            Files.createDirectories(userHomePath);
-        } else {
-            log.debug("Using preferences directory in user home: {}", userHomePath);
+        Properties propertyValues = new Properties();
+        if (Files.exists(propertyValuesFile)) {
+            log.debug("Loading existing preferences values from file at: {}", propertyValuesFile);
+            try (InputStream propertyValuesFileStream = new BufferedInputStream(Files.newInputStream(propertyValuesFile))) {
+                propertyValues.loadFromXML(propertyValuesFileStream);
+            } catch (Exception e) {
+                log.error("Cannot read application prefences from file at: {}", propertyValuesFile, e);
+            }
         }
-        return new ImageTigerPreferences(userHomePath);
+
+        this.setPropertyValues(propertyValues);
+        this.setPropertyValuesPath(propertyValuesFile);
+        this.setProperties(new HashMap<>());
     }
 
-    private Path getStorageDirectory() {
-        return this.storageDirectory;
+    public ObjectProperty<File> createFileProperty(String propertyName, File defaultValue) {
+        return this.createObjectProperty(propertyName, defaultValue, File::new, File::getAbsolutePath);
     }
-    private void setStorageDirectory(Path storageDirectory) {
-        this.storageDirectory = storageDirectory;
+
+    public <T> ObjectProperty<T> createObjectProperty(String propertyName, T defaultValue, Function<String, ? extends T> toObjectFunction, Function<T, String> toStringFunction) {
+        String initialStringValue = this.getPropertyValues().getProperty(propertyName, defaultValue == null ? null : toStringFunction.apply(defaultValue));
+        ObjectProperty<T> objectProperty = new SimpleObjectProperty<>(StringUtils.isEmpty(initialStringValue) ? null : toObjectFunction.apply(initialStringValue));
+        StringProperty boundProperty = this.createProperty(propertyName, defaultValue == null ? null : toStringFunction.apply(defaultValue));
+        boundProperty.addListener((o, oldValue, newValue) -> {
+            T newObject = StringUtils.isEmpty(newValue) ? null : toObjectFunction.apply(newValue);
+            if (!Objects.equals(newObject, objectProperty.getValue())) {
+                objectProperty.setValue(newObject);
+            }
+        });
+        objectProperty.addListener((o, oldValue, newValue) -> {
+            String newString = newValue == null ? null : toStringFunction.apply(newValue);
+            if (!Objects.equals(newString, boundProperty.getValue())) {
+                boundProperty.setValue(newString);
+            }
+        });
+        return objectProperty;
+    }
+
+    public synchronized StringProperty createProperty(String propertyName, String defaultValue) {
+        return this.getProperties().computeIfAbsent(propertyName, newKey -> {
+            String initialValue = this.getPropertyValues().getProperty(propertyName);
+            if (StringUtils.isEmpty(initialValue)) {
+                initialValue = defaultValue;
+                this.updatePropertyValue(propertyName, defaultValue);
+            }
+            StringProperty newProperty = new SimpleStringProperty(initialValue);
+            newProperty.addListener((o, oldValue, newValue) -> this.updatePropertyValue(propertyName, newValue));
+            return newProperty;
+        });
+    }
+
+    private synchronized void updatePropertyValue(String propertyName, String propertyValue) {
+        String existingPropertyValue = this.getPropertyValues().getProperty(propertyName);
+        if (!Objects.equals(propertyValue, existingPropertyValue)) {
+            if (StringUtils.isEmpty(propertyValue)) {
+                this.getPropertyValues().remove(propertyName);
+            } else {
+                this.getPropertyValues().setProperty(propertyName, propertyValue);
+            }
+            log.debug("Updating preferences values into file at: {}", this.getPropertyValuesPath());
+            try (OutputStream targetStream = new BufferedOutputStream(Files.newOutputStream(this.getPropertyValuesPath()))) {
+                this.getPropertyValues().storeToXML(targetStream, "Preferences");
+                targetStream.flush();
+            } catch (Exception e) {
+                log.error("Cannot write application prefences into file at: {}", this.getPropertyValuesPath(), e);
+            }
+        }
+    }
+
+    private Properties getPropertyValues() {
+        return this.propertyValues;
+    }
+    private void setPropertyValues(Properties propertyValues) {
+        this.propertyValues = propertyValues;
+    }
+
+    private Path getPropertyValuesPath() {
+        return this.propertyValuesPath;
+    }
+    private void setPropertyValuesPath(Path propertyValuesPath) {
+        this.propertyValuesPath = propertyValuesPath;
+    }
+
+    private Map<String, StringProperty> getProperties() {
+        return this.properties;
+    }
+    private void setProperties(Map<String, StringProperty> properties) {
+        this.properties = properties;
     }
 
 }
