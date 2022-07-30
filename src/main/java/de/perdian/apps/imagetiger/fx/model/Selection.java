@@ -16,22 +16,45 @@
 package de.perdian.apps.imagetiger.fx.model;
 
 import java.io.File;
+import java.util.Objects;
 
+import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Selection {
 
     private BooleanProperty busy = new SimpleBooleanProperty(false);
     private BooleanProperty dirty = new SimpleBooleanProperty(false);
     private ObjectProperty<File> selectedDirectory = null;
+    private ObservableList<ImageFile> availableImageFiles = null;
+    private ObservableList<ImageFile> selectedImageFiles = null;
+    private ObjectProperty<ImageFile> primaryImageFile = null;
 
     public Selection() {
+
         this.setBusy(new SimpleBooleanProperty());
         this.setDirty(new SimpleBooleanProperty());
         this.setSelectedDirectory(new SimpleObjectProperty<>());
+        this.setAvailableImageFiles(FXCollections.observableArrayList());
+        this.setSelectedImageFiles(FXCollections.observableArrayList());
+        this.setPrimaryImageFile(new SimpleObjectProperty<>());
+
+        this.getPrimaryImageFile().addListener((o, oldValue, newValue) -> {
+            if (!Objects.equals(oldValue, newValue)) {
+                if (oldValue != null) {
+                    oldValue.getPrimary().setValue(false);
+                }
+                if (newValue != null) {
+                    newValue.getPrimary().setValue(true);
+                }
+            }
+        });
+
     }
 
     public BooleanProperty getBusy() {
@@ -53,6 +76,27 @@ public class Selection {
     }
     private void setSelectedDirectory(ObjectProperty<File> selectedDirectory) {
         this.selectedDirectory = selectedDirectory;
+    }
+
+    public ObservableList<ImageFile> getAvailableImageFiles() {
+        return this.availableImageFiles;
+    }
+    private void setAvailableImageFiles(ObservableList<ImageFile> availableImageFiles) {
+        this.availableImageFiles = availableImageFiles;
+    }
+
+    public ObservableList<ImageFile> getSelectedImageFiles() {
+        return this.selectedImageFiles;
+    }
+    private void setSelectedImageFiles(ObservableList<ImageFile> selectedImageFiles) {
+        this.selectedImageFiles = selectedImageFiles;
+    }
+
+    public ObjectProperty<ImageFile> getPrimaryImageFile() {
+        return this.primaryImageFile;
+    }
+    public void setPrimaryImageFile(ObjectProperty<ImageFile> primaryImageFile) {
+        this.primaryImageFile = primaryImageFile;
     }
 
 }

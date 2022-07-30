@@ -36,7 +36,7 @@ class DirectoryTreeView extends TreeView<File> {
 
     public DirectoryTreeView() {
 
-        MenuItem reloadMenuItem = new MenuItem("Reload", new FontIcon(MaterialDesignR.REFRESH));
+        MenuItem reloadMenuItem = new MenuItem("Reload children", new FontIcon(MaterialDesignR.REFRESH));
         reloadMenuItem.disableProperty().bind(this.getSelectionModel().selectedItemProperty().isNull());
         reloadMenuItem.setOnAction(event -> ((DirectoryTreeItem)this.getSelectionModel().selectedItemProperty().getValue()).reloadChildren());
         ContextMenu contextMenu = new ContextMenu(reloadMenuItem);
@@ -45,6 +45,7 @@ class DirectoryTreeView extends TreeView<File> {
         this.setShowRoot(false);
         this.setCellFactory(TextFieldTreeCell.forTreeView(new DirectoryStringConverter()));
         this.setContextMenu(contextMenu);
+
     }
 
     void selectDirectory(File directory) {

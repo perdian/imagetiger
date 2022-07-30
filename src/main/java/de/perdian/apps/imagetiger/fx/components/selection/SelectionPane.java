@@ -15,12 +15,55 @@
  */
 package de.perdian.apps.imagetiger.fx.components.selection;
 
+import de.perdian.apps.imagetiger.fx.components.selection.actions.ActionsPane;
+import de.perdian.apps.imagetiger.fx.components.selection.files.FileListPane;
+import de.perdian.apps.imagetiger.fx.components.selection.files.FileThumbnailsPane;
+import de.perdian.apps.imagetiger.fx.components.selection.tags.TagsPane;
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import javafx.scene.layout.BorderPane;
+import javafx.geometry.Insets;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
-public class SelectionPane extends BorderPane {
+public class SelectionPane extends GridPane {
 
     public SelectionPane(Selection selection) {
+
+        FileListPane fileListPane = new FileListPane(selection);
+        fileListPane.disableProperty().bind(selection.getBusy());
+        GridPane.setVgrow(fileListPane, Priority.ALWAYS);
+
+        FileThumbnailsPane fileThumbnailsPane = new FileThumbnailsPane(selection);
+        fileThumbnailsPane.disableProperty().bind(selection.getBusy());
+        fileThumbnailsPane.setPadding(new Insets(5, 5, 5, 5));
+        TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", fileThumbnailsPane);
+        fileThumbnailsTitledPane.setCollapsible(false);
+        fileThumbnailsTitledPane.setMaxHeight(Double.MAX_VALUE);
+        fileThumbnailsTitledPane.setBorder(null);
+        GridPane.setHgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
+        GridPane.setVgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
+
+        ActionsPane actionsPane = new ActionsPane(selection);
+        actionsPane.disableProperty().bind(selection.getBusy());
+        actionsPane.setPadding(new Insets(5, 5, 5, 5));
+        TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
+        actionsTitledPane.setCollapsible(false);
+        GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
+
+        TagsPane tagsPane = new TagsPane(selection);
+        tagsPane.disableProperty().bind(selection.getBusy());
+        tagsPane.setPadding(new Insets(5, 5, 5, 5));
+        TitledPane tagsTitledPane = new TitledPane("Tags", tagsPane);
+        tagsTitledPane.setCollapsible(false);
+        GridPane.setHgrow(tagsTitledPane, Priority.ALWAYS);
+
+        this.setHgap(10);
+        this.setVgap(10);
+        this.add(fileListPane, 0, 0, 1, 1);
+        this.add(fileThumbnailsTitledPane, 1, 0, 1, 1);
+        this.add(actionsTitledPane, 0, 1, 2, 1);
+        this.add(tagsTitledPane, 0, 2, 2, 1);
+
     }
 
 }

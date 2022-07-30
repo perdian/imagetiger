@@ -18,6 +18,7 @@ package de.perdian.apps.imagetiger.fx;
 import java.io.File;
 import java.util.Objects;
 
+import de.perdian.apps.imagetiger.fx.actions.UpdateSelectionOnDirectoryChangeListener;
 import de.perdian.apps.imagetiger.fx.components.directories.DirectoryPane;
 import de.perdian.apps.imagetiger.fx.components.selection.SelectionPane;
 import de.perdian.apps.imagetiger.fx.components.status.StatusPane;
@@ -43,7 +44,7 @@ class ImageTigerPane extends GridPane {
 
         DirectoryPane directoryPane = new DirectoryPane();
         directoryPane.setMinWidth(300);
-        this.bindBidirectional(directoryPane.selectedDirectoryProperty(), selection.getSelectedDirectory());
+        directoryPane.selectedDirectoryProperty().addListener(new UpdateSelectionOnDirectoryChangeListener(selection, jobExecutor));
         GridPane.setVgrow(directoryPane, Priority.ALWAYS);
 
         StatusPane statusPane = new StatusPane(jobExecutor);
