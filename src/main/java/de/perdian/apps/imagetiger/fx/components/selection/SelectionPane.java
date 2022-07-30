@@ -15,6 +15,7 @@
  */
 package de.perdian.apps.imagetiger.fx.components.selection;
 
+import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.components.selection.actions.ActionsPane;
 import de.perdian.apps.imagetiger.fx.components.selection.files.FileListPane;
 import de.perdian.apps.imagetiger.fx.components.selection.files.FileThumbnailsPane;
@@ -27,15 +28,14 @@ import javafx.scene.layout.Priority;
 
 public class SelectionPane extends GridPane {
 
-    public SelectionPane(Selection selection) {
+    public SelectionPane(Selection selection, ImageTigerPreferences preferences) {
 
         FileListPane fileListPane = new FileListPane(selection);
         fileListPane.disableProperty().bind(selection.getBusy());
         GridPane.setVgrow(fileListPane, Priority.ALWAYS);
 
-        FileThumbnailsPane fileThumbnailsPane = new FileThumbnailsPane(selection);
+        FileThumbnailsPane fileThumbnailsPane = new FileThumbnailsPane(selection, preferences);
         fileThumbnailsPane.disableProperty().bind(selection.getBusy());
-        fileThumbnailsPane.setPadding(new Insets(5, 5, 5, 5));
         TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", fileThumbnailsPane);
         fileThumbnailsTitledPane.setCollapsible(false);
         fileThumbnailsTitledPane.setMaxHeight(Double.MAX_VALUE);

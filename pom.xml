@@ -150,7 +150,9 @@
                         <version>1.18.0</version>
                         <configuration>
                             <plist>
+<!--
                                 <CFBundleIconFile>src/bundle/macos/resources/imagetiger.icns</CFBundleIconFile>
+-->
                                 <JVMMainClassName>de.perdian.apps.imagetiger.fx.ImageTigerLauncher</JVMMainClassName>
                                 <JVMVersion>${java.version}+</JVMVersion>
                                 <JVMOptions>

@@ -32,7 +32,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -65,6 +67,25 @@ public class ImageTigerPreferences {
 
     public ObjectProperty<File> createFileProperty(String propertyName, File defaultValue) {
         return this.createObjectProperty(propertyName, defaultValue, File::new, File::getAbsolutePath);
+    }
+
+    public IntegerProperty createIntegerProperty(String propertyName, Integer defaultValue) {
+        StringProperty stringProperty = this.createProperty(propertyName, defaultValue == null ? null : defaultValue.toString());
+        IntegerProperty integerProperty = new SimpleIntegerProperty(defaultValue == null ? 0 : defaultValue.intValue());
+        try {
+            integerProperty.setValue(Integer.parseInt(stringProperty.getValue()));
+        } catch (Exception e) {}
+        integerProperty.addListener((o, oldValue, newValue) -> stringProperty.setValue(String.valueOf(newValue)));
+        stringProperty.addListener((o, oldValue, newValue) -> {
+            if (StringUtils.isEmpty(newValue)) {
+                integerProperty.setValue(null);
+            } else {
+                try {
+                    integerProperty.setValue(Integer.valueOf(newValue.strip()));
+                } catch (Exception e) {};
+            }
+        });
+        return integerProperty;
     }
 
     public <T> ObjectProperty<T> createObjectProperty(String propertyName, T defaultValue, Function<String, ? extends T> toObjectFunction, Function<T, String> toStringFunction) {

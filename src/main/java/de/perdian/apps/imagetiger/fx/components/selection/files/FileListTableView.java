@@ -16,15 +16,18 @@
 package de.perdian.apps.imagetiger.fx.components.selection.files;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
+import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ObservableList;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -34,8 +37,8 @@ import javafx.util.Callback;
 
 public class FileListTableView extends TableView<ImageFile> {
 
-    FileListTableView(ObservableList<ImageFile> availableFiles) {
-        super(availableFiles);
+    FileListTableView(Selection selection) {
+        super(selection.getAvailableImageFiles());
 
         TableColumn<ImageFile, Boolean> dirtyColumn = new TableColumn<>("");
         dirtyColumn.setCellValueFactory(callback -> callback.getValue().getDirty());
@@ -59,6 +62,43 @@ public class FileListTableView extends TableView<ImageFile> {
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         this.getColumns().setAll(List.of(dirtyColumn, focusColumn, fileNameColumn));
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        AtomicBoolean tableViewSelectionListenerActive = new AtomicBoolean(false);
+
+        this.getSelectionModel().getSelectedItems().addListener((ListChangeListener.Change<? extends ImageFile> change) -> {
+            if (!tableViewSelectionListenerActive.get()) {
+                List<? extends ImageFile> newSelectedFiles = change.getList();
+                List<ImageFile> selectionFiles = selection.getSelectedImageFiles();
+                if (!newSelectedFiles.equals(selectionFiles)) {
+                    selection.getSelectedImageFiles().setAll(newSelectedFiles);
+                }
+            }
+        });
+        selection.getSelectedImageFiles().addListener((ListChangeListener.Change<? extends ImageFile> change) -> {
+            List<? extends ImageFile> newSelectedFiles = change.getList();
+            List<ImageFile> tableViewFiles = this.getSelectionModel().getSelectedItems();
+            if (!newSelectedFiles.equals(tableViewFiles)) {
+                tableViewSelectionListenerActive.set(true);
+                try {
+                    this.getSelectionModel().clearSelection();
+                    for (int i=0; i < this.getItems().size(); i++) {
+                        if (newSelectedFiles.contains(this.getItems().get(i))) {
+                            this.getSelectionModel().select(i);
+                        }
+                    }
+                } finally {
+                    tableViewSelectionListenerActive.set(false);
+                }
+            }
+        });
+
+        this.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> {
+            if (!tableViewSelectionListenerActive.get()) {
+                if (!Objects.equals(newValue, selection.getPrimaryImageFile().getValue())) {
+                    selection.getPrimaryImageFile().setValue(newValue);
+                }
+            }
+        });
 
     }
 
