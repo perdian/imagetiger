@@ -17,10 +17,18 @@ package de.perdian.apps.imagetiger.model.impl;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Metadata;
+
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageFileParser;
 
 public class DefaultImageFileParser implements ImageFileParser {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultImageFileParser.class);
 
     @Override
     public boolean isPotentialImageFile(File file) {
@@ -30,6 +38,12 @@ public class DefaultImageFileParser implements ImageFileParser {
     @Override
     public ImageFile parseFile(File osFile) {
         DefaultImageFile imageFile = new DefaultImageFile(osFile);
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(osFile);
+            System.err.println(metadata);
+        } catch (Exception e) {
+            log.debug("Cannot read image metadata from file at: {}", osFile.getAbsolutePath(), e);
+        }
         return imageFile;
     }
 
