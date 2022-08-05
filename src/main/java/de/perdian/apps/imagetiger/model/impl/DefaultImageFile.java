@@ -20,10 +20,11 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -52,13 +53,16 @@ class DefaultImageFile implements ImageFile {
         this.setPrimary(new SimpleBooleanProperty(false));
         this.setFileName(new ImageDataProperty<>(osFile.getName()));
         this.setFileDate(new ImageDataProperty<>(Instant.ofEpochMilli(osFile.lastModified())));
-        this.setProperties(new HashMap<>());
+
+        Map<ImageDataKey, ImageDataProperty<String>> properties = Arrays.stream(ImageDataKey.values())
+            .collect(Collectors.toMap(key -> key, key -> new ImageDataProperty<>(null)));
+        this.setProperties(properties);
 
         BooleanProperty dirtyProperty = new SimpleBooleanProperty();
         List<BooleanBinding> dirtyProviders = new ArrayList<>();
         dirtyProviders.add(this.getFileName().getDirty());
         dirtyProviders.add(this.getFileDate().getDirty());
-        this.getProperties().forEach((key, value) -> dirtyProviders.add(value.getDirty()));
+        properties.forEach((key, value) -> dirtyProviders.add(value.getDirty()));
         this.setDirty(dirtyProperty);
 
         dirtyProviders.forEach(dirtyProvider -> {
@@ -155,6 +159,11 @@ class DefaultImageFile implements ImageFile {
     }
     private void setFileDate(ImageDataProperty<Instant> fileDate) {
         this.fileDate = fileDate;
+    }
+
+    void resetProperty(ImageDataKey key, String value) {
+        this.getProperties().get(key).getSavedValue().setValue(value);
+        this.getProperties().get(key).getNewValue().setValue(value);
     }
 
     @Override

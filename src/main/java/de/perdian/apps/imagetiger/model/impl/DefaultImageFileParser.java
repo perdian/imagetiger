@@ -16,15 +16,28 @@
 package de.perdian.apps.imagetiger.model.impl;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.file.FileTypeDirectory;
+import com.drew.metadata.jfif.JfifDirectory;
+import com.drew.metadata.jpeg.JpegDirectory;
 
+import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageFileParser;
+import de.perdian.apps.imagetiger.model.ImageTigerConstants;
 
 public class DefaultImageFileParser implements ImageFileParser {
 
@@ -45,9 +58,105 @@ public class DefaultImageFileParser implements ImageFileParser {
     private void appendMetadata(DefaultImageFile imageFile, File osFile) {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(osFile);
+//            for (Directory directory : metadata.getDirectories()) {
+//                System.err.println(directory.toString() + " == " + directory.getClass().getName());
+//                for (Tag tag : directory.getTags()) {
+//                    System.err.println(" - " + tag.getTagName() + ": " + directory.getString(tag.getTagType()));
+//                }
+//            }
+            for (ExifSubIFDDirectory exifImageDirectory : metadata.getDirectoriesOfType(ExifSubIFDDirectory.class)) {
+                DirectoryToPropertyExtractor extractor = new DirectoryToPropertyExtractor(exifImageDirectory, imageFile);
+                extractor.extractExifDate(ImageDataKey.DATETIME, ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL, ExifSubIFDDirectory.TAG_DATETIME);
+                extractor.extractUtfOffset(ImageDataKey.DATETIME_ZONE, ExifSubIFDDirectory.TAG_TIME_ZONE_ORIGINAL, ExifSubIFDDirectory.TAG_TIME_ZONE);
+            }
+            for (FileTypeDirectory fileTypeDirectory : metadata.getDirectoriesOfType(FileTypeDirectory.class)) {
+                DirectoryToPropertyExtractor extractor = new DirectoryToPropertyExtractor(fileTypeDirectory, imageFile);
+                extractor.extractString(ImageDataKey.MIME_TYPE, FileTypeDirectory.TAG_DETECTED_FILE_MIME_TYPE);
+            }
+            for (JpegDirectory jpegDirectory : metadata.getDirectoriesOfType(JpegDirectory.class)) {
+                DirectoryToPropertyExtractor extractor = new DirectoryToPropertyExtractor(jpegDirectory, imageFile);
+                extractor.extractString(ImageDataKey.WIDTH, JpegDirectory.TAG_IMAGE_WIDTH);
+                extractor.extractString(ImageDataKey.HEIGHT, JpegDirectory.TAG_IMAGE_HEIGHT);
+            }
+            for (JfifDirectory jfifDirectory : metadata.getDirectoriesOfType(JfifDirectory.class)) {
+                DirectoryToPropertyExtractor extractor = new DirectoryToPropertyExtractor(jfifDirectory, imageFile);
+                extractor.extractString(ImageDataKey.RESOLUTION_X, JfifDirectory.TAG_RESX);
+                extractor.extractString(ImageDataKey.RESOLUTION_Y, JfifDirectory.TAG_RESY);
+            }
         } catch (Exception e) {
             log.debug("Cannot read image metadata from file at: {}", osFile.getAbsolutePath(), e);
         }
+    }
+
+    private static class DirectoryToPropertyExtractor {
+
+        private static final DateTimeFormatter EXIF_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+
+        private Directory directory = null;
+        private DefaultImageFile imageFile = null;
+
+        DirectoryToPropertyExtractor(Directory directory, DefaultImageFile imageFile) {
+            this.setDirectory(directory);
+            this.setImageFile(imageFile);
+        }
+
+        @Override
+        public String toString() {
+            ToStringBuilder toStringBuilder = new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE);
+            toStringBuilder.append("directory", this.getDirectory() + " (" + this.getDirectory().getClass().getName() + ")");
+            toStringBuilder.append("imageFile", this.getImageFile());
+            return toStringBuilder.toString();
+        }
+
+        void extractString(ImageDataKey key, int... tags) {
+            for (int tag : tags) {
+                String tagValue = this.getDirectory().getString(tag);
+                if (StringUtils.isNotEmpty(tagValue)) {
+                    this.getImageFile().resetProperty(key, tagValue);
+                }
+            }
+        }
+
+        void extractExifDate(ImageDataKey key, int... tags) {
+            for (int tag : tags) {
+                try {
+                    String tagValue = this.getDirectory().getString(tag);
+                    if (StringUtils.isNotEmpty(tagValue)) {
+                        LocalDateTime parsedDateTime = LocalDateTime.parse(tagValue, EXIF_DATETIME_FORMATTER);
+                        this.getImageFile().resetProperty(key, ImageTigerConstants.DATE_TIME_FORMATTER.format(parsedDateTime));
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.warn("Cannot extract tag from directory targeted for: {} [{}]", key, this, e);
+                }
+            }
+        }
+
+        void extractUtfOffset(ImageDataKey key, int... tags) {
+            for (int tag : tags) {
+                String tagValue = this.getDirectory().getString(tag);
+                if (StringUtils.isNotEmpty(tagValue)) {
+                    ZoneOffset zoneOffset = ZoneOffset.of(tagValue);
+                    this.getImageFile().resetProperty(key, zoneOffset.toString());
+                    return;
+                }
+            }
+        }
+
+        private Directory getDirectory() {
+            return this.directory;
+        }
+        private void setDirectory(Directory directory) {
+            this.directory = directory;
+        }
+
+        private DefaultImageFile getImageFile() {
+            return this.imageFile;
+        }
+        private void setImageFile(DefaultImageFile imageFile) {
+            this.imageFile = imageFile;
+        }
+
     }
 
 }

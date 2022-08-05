@@ -15,16 +15,10 @@
  */
 package de.perdian.apps.imagetiger.model;
 
-public enum ImageDataKey {
+import java.time.format.DateTimeFormatter;
 
-    DATETIME,
-    DATETIME_ZONE,
+public class ImageTigerConstants {
 
-    WIDTH,
-    HEIGHT,
-    RESOLUTION_X,
-    RESOLUTION_Y,
-
-    MIME_TYPE;
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
 }
