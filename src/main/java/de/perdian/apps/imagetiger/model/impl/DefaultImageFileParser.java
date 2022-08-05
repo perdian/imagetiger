@@ -45,7 +45,6 @@ public class DefaultImageFileParser implements ImageFileParser {
     private void appendMetadata(DefaultImageFile imageFile, File osFile) {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(osFile);
-            System.err.println(metadata);
         } catch (Exception e) {
             log.debug("Cannot read image metadata from file at: {}", osFile.getAbsolutePath(), e);
         }

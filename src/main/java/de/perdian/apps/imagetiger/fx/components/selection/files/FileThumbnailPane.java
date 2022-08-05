@@ -30,6 +30,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -42,12 +43,27 @@ class FileThumbnailPane extends BorderPane {
 
     FileThumbnailPane(Selection selection, ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
 
-        Label imageLabel = new Label();
-        imageLabel.setAlignment(Pos.CENTER);
-        imageLabel.prefWidthProperty().bind(widthAndHeightProperty);
-        imageLabel.prefHeightProperty().bind(widthAndHeightProperty);
-        this.updateImage(imageFile, imageLabel, widthAndHeightProperty, widthAndHeightProperty.intValue(), thumnailsScalingExecutor);
-        this.setCenter(imageLabel);
+        ToggleButton imageButton = new ToggleButton();
+        imageButton.setAlignment(Pos.CENTER);
+        imageButton.prefWidthProperty().bind(widthAndHeightProperty);
+        imageButton.prefHeightProperty().bind(widthAndHeightProperty);
+        imageButton.setSelected(selection.getSelectedImageFiles().contains(imageFile));
+        imageButton.selectedProperty().addListener((o, oldValue, newValue) -> {
+            if (newValue && !selection.getSelectedImageFiles().contains(imageFile)) {
+                selection.getSelectedImageFiles().add(imageFile);
+            } else if (!newValue && selection.getSelectedImageFiles().contains(imageFile)) {
+                selection.getSelectedImageFiles().remove(imageFile);
+            }
+            selection.getPrimaryImageFile().setValue(imageFile);
+        });
+        imageButton.focusedProperty().addListener((o, oldValue, newValue) -> {
+            if (newValue) {
+                selection.getPrimaryImageFile().setValue(imageFile);
+            }
+        });
+        selection.getSelectedImageFiles().addListener((ListChangeListener.Change<? extends ImageFile> change) -> imageButton.setSelected(change.getList().contains(imageFile)));
+        this.updateImage(imageFile, imageButton, widthAndHeightProperty, widthAndHeightProperty.intValue(), thumnailsScalingExecutor);
+        this.setCenter(imageButton);
 
         Label fileNameLabel = new Label();
         fileNameLabel.textProperty().bind(imageFile.getFileName());
@@ -85,9 +101,9 @@ class FileThumbnailPane extends BorderPane {
         }
     }
 
-    private void updateImage(ImageFile imageFile, Label imageLabel, IntegerProperty widthAndHeightProperty, int widthAndHeight, Executor thumnailsScalingExecutor) {
+    private void updateImage(ImageFile imageFile, ToggleButton imageButton, IntegerProperty widthAndHeightProperty, int widthAndHeight, Executor thumnailsScalingExecutor) {
         thumnailsScalingExecutor.execute(() -> {
-            Platform.runLater(() -> imageLabel.setText("Loading image..."));
+            Platform.runLater(() -> imageButton.setText("Loading image..."));
             try {
                 BufferedImage image = imageFile.loadBufferedImage();
                 ImageView imageView = new ImageView(SwingFXUtils.toFXImage(image, null));
@@ -95,13 +111,13 @@ class FileThumbnailPane extends BorderPane {
                 imageView.fitWidthProperty().bind(widthAndHeightProperty);
                 imageView.fitHeightProperty().bind(widthAndHeightProperty);
                 Platform.runLater(() -> {
-                    imageLabel.setText("");
-                    imageLabel.setGraphic(imageView);
+                    imageButton.setText("");
+                    imageButton.setGraphic(imageView);
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
-                    imageLabel.setGraphic(null);
-                    imageLabel.setText("Cannot load image!");
+                    imageButton.setGraphic(null);
+                    imageButton.setText("Cannot load image!");
                 });
             }
         });

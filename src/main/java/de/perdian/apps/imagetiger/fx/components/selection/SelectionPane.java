@@ -37,6 +37,7 @@ public class SelectionPane extends GridPane {
         FileThumbnailsPane fileThumbnailsPane = new FileThumbnailsPane(selection, preferences);
         fileThumbnailsPane.disableProperty().bind(selection.getBusy());
         TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", fileThumbnailsPane);
+        fileThumbnailsTitledPane.setFocusTraversable(false);
         fileThumbnailsTitledPane.setCollapsible(false);
         fileThumbnailsTitledPane.setMaxHeight(Double.MAX_VALUE);
         fileThumbnailsTitledPane.setBorder(null);
@@ -47,6 +48,7 @@ public class SelectionPane extends GridPane {
         actionsPane.disableProperty().bind(selection.getBusy());
         actionsPane.setPadding(new Insets(5, 5, 5, 5));
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
+        actionsTitledPane.setFocusTraversable(false);
         actionsTitledPane.setCollapsible(false);
         GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
 
@@ -54,6 +56,7 @@ public class SelectionPane extends GridPane {
         tagsPane.disableProperty().bind(selection.getBusy());
         tagsPane.setPadding(new Insets(5, 5, 5, 5));
         TitledPane tagsTitledPane = new TitledPane("Tags", tagsPane);
+        tagsTitledPane.setFocusTraversable(false);
         tagsTitledPane.setCollapsible(false);
         GridPane.setHgrow(tagsTitledPane, Priority.ALWAYS);
 
