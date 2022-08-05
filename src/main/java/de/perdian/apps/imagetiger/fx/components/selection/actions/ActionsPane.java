@@ -28,6 +28,7 @@ public class ActionsPane extends BorderPane {
     public ActionsPane(Selection selection) {
 
         Button selectButton = new Button("Select");
+        selectButton.setFocusTraversable(false);
         selectButton.setOnAction(event -> {
             List<ImageFile> allFiles = selection.getAvailableImageFiles();
             if (allFiles.size() > 3) {

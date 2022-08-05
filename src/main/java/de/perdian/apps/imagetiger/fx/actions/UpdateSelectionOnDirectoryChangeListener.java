@@ -21,9 +21,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobContext;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
@@ -34,8 +31,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 public class UpdateSelectionOnDirectoryChangeListener implements ChangeListener<File> {
-
-    private static final Logger log = LoggerFactory.getLogger(UpdateSelectionOnDirectoryChangeListener.class);
 
     private Selection selection = null;
     private JobExecutor jobExecutor = null;
@@ -52,9 +47,9 @@ public class UpdateSelectionOnDirectoryChangeListener implements ChangeListener<
             List<ImageFile> imageFiles = this.parseImageFiles(newValue, context);
             synchronized (this.getSelection()) {
                 if (!context.isCancelled()) {
-                    this.getSelection().getAvailableImageFiles().setAll(imageFiles);
-                    this.getSelection().getSelectedImageFiles().clear();
                     this.getSelection().getSelectedDirectory().setValue(newValue);
+                    this.getSelection().getSelectedImageFiles().clear();
+                    this.getSelection().getAvailableImageFiles().setAll(imageFiles);
                 }
             }
         });

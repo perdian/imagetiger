@@ -30,10 +30,12 @@ public class DirectoryPane extends GridPane {
     public DirectoryPane() {
 
         TextField directoryPathField = new TextField();
+        directoryPathField.setFocusTraversable(false);
         directoryPathField.setOnAction(event -> this.setSelectedDirectory(new File(((TextField)event.getSource()).getText())));
         GridPane.setHgrow(directoryPathField, Priority.ALWAYS);
 
         DirectoryTreeView pathTreeView = new DirectoryTreeView();
+        pathTreeView.setFocusTraversable(false);
         pathTreeView.selectDirectory(new File(System.getProperty("user.home")));
         pathTreeView.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> this.selectedDirectoryProperty().setValue(newValue == null ? null : newValue.getValue()));
         GridPane.setHgrow(pathTreeView, Priority.ALWAYS);

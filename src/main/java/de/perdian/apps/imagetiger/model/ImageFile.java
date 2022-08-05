@@ -15,11 +15,17 @@
  */
 package de.perdian.apps.imagetiger.model;
 
+import java.awt.image.BufferedImage;
+
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.StringProperty;
 
 public interface ImageFile {
 
+    BufferedImage loadBufferedImage() throws Exception;
+
     BooleanProperty getPrimary();
     BooleanProperty getDirty();
+    StringProperty getFileName();
 
 }

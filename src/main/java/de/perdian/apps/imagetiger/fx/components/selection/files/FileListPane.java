@@ -21,7 +21,9 @@ import javafx.scene.layout.BorderPane;
 public class FileListPane extends BorderPane {
 
     public FileListPane(Selection selection) {
-        this.setCenter(new FileListTableView(selection));
+        FileListTableView fileListTableView = new FileListTableView(selection);
+        fileListTableView.setFocusTraversable(false);
+        this.setCenter(fileListTableView);
     }
 
 }

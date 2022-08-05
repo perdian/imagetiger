@@ -38,13 +38,17 @@ public class DefaultImageFileParser implements ImageFileParser {
     @Override
     public ImageFile parseFile(File osFile) {
         DefaultImageFile imageFile = new DefaultImageFile(osFile);
+        this.appendMetadata(imageFile, osFile);
+        return imageFile;
+    }
+
+    private void appendMetadata(DefaultImageFile imageFile, File osFile) {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(osFile);
             System.err.println(metadata);
         } catch (Exception e) {
             log.debug("Cannot read image metadata from file at: {}", osFile.getAbsolutePath(), e);
         }
-        return imageFile;
     }
 
 }

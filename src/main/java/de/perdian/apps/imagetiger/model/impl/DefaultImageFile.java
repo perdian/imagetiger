@@ -15,22 +15,47 @@
  */
 package de.perdian.apps.imagetiger.model.impl;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 class DefaultImageFile implements ImageFile {
 
     private File osFile = null;
     private BooleanProperty primary = null;
     private BooleanProperty dirty = null;
+    private StringProperty fileName = null;
+    private BufferedImage cachedBufferedImage = null;
+    private Exception cachedBufferedImageException = null;
 
     DefaultImageFile(File osFile) {
         this.setOsFile(osFile);
         this.setPrimary(new SimpleBooleanProperty(false));
         this.setDirty(new SimpleBooleanProperty(false));
+        this.setFileName(new SimpleStringProperty(osFile.getName()));
+    }
+
+    @Override
+    public synchronized BufferedImage loadBufferedImage() throws Exception {
+        if (this.cachedBufferedImageException != null) {
+            throw this.cachedBufferedImageException;
+        } else if (this.cachedBufferedImage != null) {
+            return this.cachedBufferedImage;
+        } else {
+            try {
+                return this.cachedBufferedImage = ImageIO.read(this.getOsFile());
+            } catch (Exception e) {
+                this.cachedBufferedImageException = e;
+                throw e;
+            }
+        }
     }
 
     @Override
@@ -59,6 +84,14 @@ class DefaultImageFile implements ImageFile {
     }
     private void setDirty(BooleanProperty dirty) {
         this.dirty = dirty;
+    }
+
+    @Override
+    public StringProperty getFileName() {
+        return this.fileName;
+    }
+    private void setFileName(StringProperty fileName) {
+        this.fileName = fileName;
     }
 
 }
