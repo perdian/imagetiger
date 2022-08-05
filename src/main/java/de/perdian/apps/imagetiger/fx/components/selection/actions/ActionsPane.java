@@ -36,10 +36,6 @@ public class ActionsPane extends BorderPane {
                 selectedFiles.add(allFiles.get(0));
                 selectedFiles.add(allFiles.get(2));
                 selection.getSelectedImageFiles().setAll(selectedFiles);
-
-                selection.getAvailableImageFiles().get(2).getDirty().setValue(true);
-                selection.getAvailableImageFiles().get(4).getDirty().setValue(true);
-
             }
         });
         this.setCenter(selectButton);

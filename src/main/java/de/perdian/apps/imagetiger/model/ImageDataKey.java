@@ -15,25 +15,6 @@
  */
 package de.perdian.apps.imagetiger.model;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.Map;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-
-public interface ImageFile {
-
-    BufferedImage loadBufferedImage() throws Exception;
-
-    BooleanProperty getPrimary();
-    ReadOnlyBooleanProperty getDirty();
-
-    ImageDataProperty<String> getFileName();
-    ImageDataProperty<Instant> getFileDate();
-    Map<ImageDataKey, ImageDataProperty<String>> getProperties();
-
-    boolean updateOsFile() throws IOException;
+public enum ImageDataKey {
 
 }
