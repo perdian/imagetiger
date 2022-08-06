@@ -22,6 +22,7 @@ import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
@@ -46,9 +47,10 @@ class DataPaneControlFactory {
         return label;
     }
 
-    TextField createTextField(Function<ImageFile, ImageDataProperty<String>> propertyFunction) {
+    TextField createTextField(Function<ImageFile, ImageDataProperty<String>> propertyFunction, boolean editable) {
         TextField textField = this.createTextFieldBasics(propertyFunction);
         textField.disableProperty().bind(this.getSelection().getPrimaryImageFile().isNull());
+        textField.editableProperty().bind(new SimpleBooleanProperty(editable));
         return textField;
     }
 
@@ -58,8 +60,9 @@ class DataPaneControlFactory {
         TextField textField = new TextField();
         textField.setOnKeyPressed(event -> this.handleOnKeyPressed(event, propertyFunction));
         textField.textProperty().bindBidirectional(controlProperty);
+
         this.getSelection().getPrimaryImageFile().addListener((o, oldValue, newValue) -> {
-            if (!Objects.equals(oldValue, newValue)) {
+            if (textField.isFocused() && !Objects.equals(oldValue, newValue)) {
                 textField.selectAll();
             }
         });

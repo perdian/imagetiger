@@ -18,6 +18,7 @@ package de.perdian.apps.imagetiger.model.impl;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ class DefaultImageFile implements ImageFile {
 
     private File osFile = null;
     private ReadOnlyBooleanProperty dirty = null;
-    private BufferedImage cachedBufferedImage = null;
+    private SoftReference<BufferedImage> cachedBufferedImage = null;
     private Exception cachedBufferedImageException = null;
     private ImageDataProperty<String> fileName = null;
     private ImageDataProperty<String> fileNameWithoutExtension = null;
@@ -179,15 +180,19 @@ class DefaultImageFile implements ImageFile {
     public synchronized BufferedImage loadBufferedImage() throws Exception {
         if (this.cachedBufferedImageException != null) {
             throw this.cachedBufferedImageException;
-        } else if (this.cachedBufferedImage != null) {
-            return this.cachedBufferedImage;
         } else {
-            try {
-                return this.cachedBufferedImage = ImageIO.read(this.getOsFile());
-            } catch (Exception e) {
-                this.cachedBufferedImageException = e;
-                throw e;
+            BufferedImage resolvedImage = this.cachedBufferedImage == null ? null : this.cachedBufferedImage.get();
+            if (resolvedImage == null) {
+                try {
+                    resolvedImage = ImageIO.read(this.getOsFile());
+                    this.cachedBufferedImage = new SoftReference<>(resolvedImage);
+                } catch (Exception e) {
+                    log.debug("Cannot load image", e);
+                    this.cachedBufferedImageException = e;
+                    throw e;
+                }
             }
+            return resolvedImage;
         }
     }
 
@@ -261,6 +266,11 @@ class DefaultImageFile implements ImageFile {
 
     void resetPropertyValue(ImageDataKey key, String value) {
         this.getProperties().get(key).resetValue(value);
+    }
+
+    @Override
+    public ImageDataProperty<String> getProperty(ImageDataKey key) {
+        return this.getProperties().get(key);
     }
 
     @Override

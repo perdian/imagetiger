@@ -16,6 +16,7 @@
 package de.perdian.apps.imagetiger.fx.panes.selection.data;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.model.ImageDataKey;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -26,23 +27,44 @@ public class DataPane extends GridPane {
 
         DataPaneControlFactory controlFactory = new DataPaneControlFactory(selection);
 
-        TextField fileExtensionField = controlFactory.createTextField(imageFile -> imageFile.getFileExtension());
+        TextField fileExtensionField = controlFactory.createTextField(imageFile -> imageFile.getFileExtension(), true);
         fileExtensionField.setPrefWidth(50);
         GridPane.setHgrow(fileExtensionField, Priority.SOMETIMES);
 
-        TextField fileDateStringField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalString());
-        TextField fileDateZoneField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalZone());
+        TextField fileDateStringField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalString(), true);
+        TextField fileDateZoneField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalZone(), true);
 
-        this.setHgap(10);
-        this.setVgap(5);
-        this.add(controlFactory.createLabel("File name"), 0, 0, 1, 1);
-        this.add(controlFactory.createTextField(imageFile -> imageFile.getFileNameWithoutExtension()), 1, 0, 1, 1);
-        this.add(controlFactory.createLabel("."), 2, 0, 1, 1);
-        this.add(fileExtensionField, 3, 0, 1, 1);
-        this.add(controlFactory.createLabel("File date"), 0, 1, 1, 1);
-        this.add(fileDateStringField, 1, 1, 3, 1);
-        this.add(controlFactory.createLabel("File date zone"), 0, 2, 1, 1);
-        this.add(fileDateZoneField, 1, 2, 3, 1);
+        GridPane fileDataPane = new GridPane();
+        fileDataPane.setHgap(10);
+        fileDataPane.setVgap(5);
+        fileDataPane.add(controlFactory.createLabel("File name"), 0, 0, 1, 1);
+        fileDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getFileNameWithoutExtension(), true), 1, 0, 1, 1);
+        fileDataPane.add(controlFactory.createLabel("."), 2, 0, 1, 1);
+        fileDataPane.add(fileExtensionField, 3, 0, 1, 1);
+        fileDataPane.add(controlFactory.createLabel("File date"), 0, 1, 1, 1);
+        fileDataPane.add(fileDateStringField, 1, 1, 3, 1);
+        fileDataPane.add(controlFactory.createLabel("File date zone"), 0, 2, 1, 1);
+        fileDataPane.add(fileDateZoneField, 1, 2, 3, 1);
+        GridPane.setHgrow(fileDataPane, Priority.ALWAYS);
+
+        GridPane metaDataPane = new GridPane();
+        metaDataPane.setHgap(10);
+        metaDataPane.setVgap(5);
+        metaDataPane.add(controlFactory.createLabel("Metadata date"), 0, 0, 1, 1);
+        metaDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getProperty(ImageDataKey.DATETIME), false), 1, 0, 1, 1);
+        metaDataPane.add(controlFactory.createLabel("Metadata timezone"), 2, 0, 1, 1);
+        metaDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getProperty(ImageDataKey.DATETIME_ZONE), false), 3, 0, 1, 1);
+        metaDataPane.add(controlFactory.createLabel("Metadata width"), 0, 1, 1, 1);
+        metaDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getProperty(ImageDataKey.WIDTH), false), 1, 1, 1, 1);
+        metaDataPane.add(controlFactory.createLabel("Metadata height"), 2, 1, 1, 1);
+        metaDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getProperty(ImageDataKey.HEIGHT), false), 3, 1, 1, 1);
+        metaDataPane.add(controlFactory.createLabel("Metadata type"), 0, 2, 1, 1);
+        metaDataPane.add(controlFactory.createTextField(imageFile -> imageFile.getProperty(ImageDataKey.MIME_TYPE), false), 1, 2, 3, 1);
+        GridPane.setHgrow(metaDataPane, Priority.ALWAYS);
+
+        this.setHgap(20);
+        this.add(fileDataPane, 0, 0, 1, 1);
+        this.add(metaDataPane, 1, 0, 1, 1);
 
     }
 

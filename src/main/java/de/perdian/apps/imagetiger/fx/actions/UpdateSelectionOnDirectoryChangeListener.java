@@ -53,9 +53,7 @@ public class UpdateSelectionOnDirectoryChangeListener implements ChangeListener<
             List<ImageFile> imageFiles = this.parseImageFiles(newValue, context);
             synchronized (this.getSelection()) {
                 if (!context.isCancelled()) {
-                    this.getSelection().getSelectedDirectory().setValue(newValue);
-                    this.getSelection().getSelectedImageFiles().clear();
-                    this.getSelection().getAvailableImageFiles().setAll(imageFiles);
+                    this.getSelection().updateSelectedDirectory(newValue, imageFiles);
                 }
             }
         });

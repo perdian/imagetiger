@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -44,9 +45,14 @@ public class DefaultImageFileParser implements ImageFileParser {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultImageFileParser.class);
 
+    private static final Set<String> VALID_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif");
+
     @Override
     public boolean isPotentialImageFile(File file) {
-        return true;
+        String fileName = file.getName().toLowerCase();
+        int extensionStartIndex = fileName.lastIndexOf(".");
+        String extension = extensionStartIndex > 0 ? fileName.substring(extensionStartIndex + 1) : null;
+        return StringUtils.isNotEmpty(extension) && VALID_EXTENSIONS.contains(extension);
     }
 
     @Override

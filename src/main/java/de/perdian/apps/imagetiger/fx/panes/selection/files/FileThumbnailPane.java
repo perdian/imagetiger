@@ -102,6 +102,12 @@ class FileThumbnailPane extends GridPane {
     private void updateImage(ImageFile imageFile, Label imageLabel, IntegerProperty widthAndHeightProperty, int widthAndHeight, Executor thumnailsScalingExecutor) {
         thumnailsScalingExecutor.execute(() -> {
             Platform.runLater(() -> imageLabel.setText("Loading image..."));
+            imageLabel.visibleProperty().addListener((o, oldValue, newValue) -> {
+                System.err.println("X: " + newValue);
+            });
+
+            // TODO: We cannot use the original image, we *have* to scale it so that we don't run into
+            //       an OutOfMemoryError!
             try {
                 BufferedImage image = imageFile.loadBufferedImage();
                 ImageView imageView = new ImageView(SwingFXUtils.toFXImage(image, null));

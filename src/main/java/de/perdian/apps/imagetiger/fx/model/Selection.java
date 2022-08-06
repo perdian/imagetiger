@@ -16,6 +16,7 @@
 package de.perdian.apps.imagetiger.fx.model;
 
 import java.io.File;
+import java.util.List;
 
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.BooleanProperty;
@@ -63,6 +64,14 @@ public class Selection {
         this.setSelectedImageFiles(FXCollections.observableArrayList());
         this.setPrimaryImageFile(new SimpleObjectProperty<>());
 
+    }
+
+    public synchronized void updateSelectedDirectory(File selectedDirectory, List<ImageFile> directoryImageFiles) {
+        this.getPrimaryImageFile().setValue(null);
+        this.getSelectedDirectory().setValue(selectedDirectory);
+        this.getSelectedImageFiles().clear();
+        this.getDirtyImageFiles().clear();
+        this.getAvailableImageFiles().setAll(directoryImageFiles);
     }
 
     public BooleanProperty getBusy() {
