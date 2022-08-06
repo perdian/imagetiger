@@ -112,7 +112,7 @@ public class DefaultImageFileParser implements ImageFileParser {
             for (int tag : tags) {
                 String tagValue = this.getDirectory().getString(tag);
                 if (StringUtils.isNotEmpty(tagValue)) {
-                    this.getImageFile().resetProperty(key, tagValue);
+                    this.getImageFile().resetPropertyValue(key, tagValue);
                 }
             }
         }
@@ -123,7 +123,7 @@ public class DefaultImageFileParser implements ImageFileParser {
                     String tagValue = this.getDirectory().getString(tag);
                     if (StringUtils.isNotEmpty(tagValue)) {
                         LocalDateTime parsedDateTime = LocalDateTime.parse(tagValue, EXIF_DATETIME_FORMATTER);
-                        this.getImageFile().resetProperty(key, ImageTigerConstants.DATE_TIME_FORMATTER.format(parsedDateTime));
+                        this.getImageFile().resetPropertyValue(key, ImageTigerConstants.DATE_TIME_FORMATTER.format(parsedDateTime));
                         return;
                     }
                 } catch (Exception e) {
@@ -137,7 +137,7 @@ public class DefaultImageFileParser implements ImageFileParser {
                 String tagValue = this.getDirectory().getString(tag);
                 if (StringUtils.isNotEmpty(tagValue)) {
                     ZoneOffset zoneOffset = ZoneOffset.of(tagValue);
-                    this.getImageFile().resetProperty(key, zoneOffset.toString());
+                    this.getImageFile().resetPropertyValue(key, zoneOffset.toString());
                     return;
                 }
             }

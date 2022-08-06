@@ -20,14 +20,12 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 public interface ImageFile {
 
     BufferedImage loadBufferedImage() throws Exception;
 
-    BooleanProperty getPrimary();
     ReadOnlyBooleanProperty getDirty();
 
     ImageDataProperty<String> getFileName();

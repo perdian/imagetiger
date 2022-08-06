@@ -31,15 +31,14 @@ import javax.imageio.ImageIO;
 import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 
 class DefaultImageFile implements ImageFile {
 
     private File osFile = null;
-    private BooleanProperty primary = null;
     private ReadOnlyBooleanProperty dirty = null;
     private BufferedImage cachedBufferedImage = null;
     private Exception cachedBufferedImageException = null;
@@ -50,7 +49,6 @@ class DefaultImageFile implements ImageFile {
     DefaultImageFile(File osFile) {
 
         this.setOsFile(osFile);
-        this.setPrimary(new SimpleBooleanProperty(false));
         this.setFileName(new ImageDataProperty<>(osFile.getName()));
         this.setFileDate(new ImageDataProperty<>(Instant.ofEpochMilli(osFile.lastModified())));
 
@@ -59,7 +57,7 @@ class DefaultImageFile implements ImageFile {
         this.setProperties(properties);
 
         BooleanProperty dirtyProperty = new SimpleBooleanProperty();
-        List<BooleanBinding> dirtyProviders = new ArrayList<>();
+        List<ObservableBooleanValue> dirtyProviders = new ArrayList<>();
         dirtyProviders.add(this.getFileName().getDirty());
         dirtyProviders.add(this.getFileDate().getDirty());
         properties.forEach((key, value) -> dirtyProviders.add(value.getDirty()));
@@ -68,7 +66,7 @@ class DefaultImageFile implements ImageFile {
         dirtyProviders.forEach(dirtyProvider -> {
             dirtyProvider.addListener((o, oldValue, newValue) -> {
                 boolean newDirtyState = newValue;
-                for (BooleanBinding otherDirtyProvider : dirtyProviders) {
+                for (ObservableBooleanValue otherDirtyProvider : dirtyProviders) {
                     if (otherDirtyProvider != dirtyProvider) {
                         newDirtyState = newDirtyState || dirtyProvider.get();
                     }
@@ -88,7 +86,7 @@ class DefaultImageFile implements ImageFile {
         if (this.getFileName().getDirty().get()) {
             File newOsFile = new File(osFile.getParentFile(), this.getFileName().getNewValue().getValue());
             osFile.renameTo(newOsFile);
-            this.getFileName().getSavedValue().setValue(this.getFileName().getNewValue().getValue());
+            this.getFileName().resetValue(this.getFileName().getNewValue().getValue());
             fileUpdated = true;
         }
         Instant newFileDate = this.getFileDate().getNewValue().getValue();
@@ -96,8 +94,7 @@ class DefaultImageFile implements ImageFile {
             osFile.setLastModified(newFileDate.toEpochMilli());
             fileUpdated = true;
         }
-        this.getFileDate().getSavedValue().setValue(newFileDate);
-        this.getFileDate().getNewValue().setValue(newFileDate);
+        this.getFileDate().resetValue(newFileDate);
         return fileUpdated;
     }
 
@@ -130,14 +127,6 @@ class DefaultImageFile implements ImageFile {
     }
 
     @Override
-    public BooleanProperty getPrimary() {
-        return this.primary;
-    }
-    private void setPrimary(BooleanProperty primary) {
-        this.primary = primary;
-    }
-
-    @Override
     public ReadOnlyBooleanProperty getDirty() {
         return this.dirty;
     }
@@ -161,9 +150,8 @@ class DefaultImageFile implements ImageFile {
         this.fileDate = fileDate;
     }
 
-    void resetProperty(ImageDataKey key, String value) {
-        this.getProperties().get(key).getSavedValue().setValue(value);
-        this.getProperties().get(key).getNewValue().setValue(value);
+    void resetPropertyValue(ImageDataKey key, String value) {
+        this.getProperties().get(key).resetValue(value);
     }
 
     @Override

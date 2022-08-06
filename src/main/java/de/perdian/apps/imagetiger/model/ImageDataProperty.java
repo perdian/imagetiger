@@ -19,22 +19,23 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 
 public class ImageDataProperty<T> {
 
-    private ObjectProperty<T> savedValue = null;
-    private ObjectProperty<T> newValue = null;
-    private BooleanBinding dirty = null;
+    private ObjectProperty<T> savedValueInternal = null;
+    private ObjectProperty<T> newValueInternal = null;
+    private ObservableBooleanValue dirty = null;
 
     public ImageDataProperty(T initialValue) {
         ObjectProperty<T> savedValue = new SimpleObjectProperty<>(initialValue);
         ObjectProperty<T> newValue = new SimpleObjectProperty<>(initialValue);
         this.setDirty(Bindings.equal(savedValue, newValue).not());
-        this.setSavedValue(savedValue);
-        this.setNewValue(newValue);
+        this.setSavedValueInternal(savedValue);
+        this.setNewValueInternal(newValue);
     }
 
     @Override
@@ -45,24 +46,35 @@ public class ImageDataProperty<T> {
         return toStringBuilder.toString();
     }
 
-    public ObjectProperty<T> getSavedValue() {
-        return this.savedValue;
+    public void resetValue(T value) {
+        this.getSavedValueInternal().setValue(value);
+        this.getNewValueInternal().setValue(value);
     }
-    private void setSavedValue(ObjectProperty<T> savedValue) {
-        this.savedValue = savedValue;
+
+    public ReadOnlyObjectProperty<T> getSavedValue() {
+        return this.getSavedValueInternal();
+    }
+    private ObjectProperty<T> getSavedValueInternal() {
+        return this.savedValueInternal;
+    }
+    private void setSavedValueInternal(ObjectProperty<T> savedValueInternal) {
+        this.savedValueInternal = savedValueInternal;
     }
 
     public ObjectProperty<T> getNewValue() {
-        return this.newValue;
+        return this.getNewValueInternal();
     }
-    private void setNewValue(ObjectProperty<T> newValue) {
-        this.newValue = newValue;
+    private ObjectProperty<T> getNewValueInternal() {
+        return this.newValueInternal;
+    }
+    private void setNewValueInternal(ObjectProperty<T> newValueInternal) {
+        this.newValueInternal = newValueInternal;
     }
 
-    public BooleanBinding getDirty() {
+    public ObservableBooleanValue getDirty() {
         return this.dirty;
     }
-    private void setDirty(BooleanBinding dirty) {
+    private void setDirty(ObservableBooleanValue dirty) {
         this.dirty = dirty;
     }
 
