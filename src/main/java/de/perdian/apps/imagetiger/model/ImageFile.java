@@ -29,6 +29,8 @@ public interface ImageFile {
     ReadOnlyBooleanProperty getDirty();
 
     ImageDataProperty<String> getFileName();
+    ImageDataProperty<String> getFileNameWithoutExtension();
+    ImageDataProperty<String> getFileExtension();
     ImageDataProperty<Instant> getFileDate();
     Map<ImageDataKey, ImageDataProperty<String>> getProperties();
 

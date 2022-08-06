@@ -28,12 +28,15 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 
 class DefaultImageFile implements ImageFile {
@@ -43,22 +46,46 @@ class DefaultImageFile implements ImageFile {
     private BufferedImage cachedBufferedImage = null;
     private Exception cachedBufferedImageException = null;
     private ImageDataProperty<String> fileName = null;
+    private ImageDataProperty<String> fileNameWithoutExtension = null;
+    private ImageDataProperty<String> fileExtension = null;
     private ImageDataProperty<Instant> fileDate = null;
     private Map<ImageDataKey, ImageDataProperty<String>> properties = null;
 
     DefaultImageFile(File osFile) {
 
+        String fileName = osFile.getName();
+        int fileExtensionSeparatorIndex = fileName.lastIndexOf(".");
+        String fileNameWithoutExtension = fileExtensionSeparatorIndex < 0 ? "" : fileName.substring(0, fileExtensionSeparatorIndex);
+        String fileExtension = fileExtensionSeparatorIndex < 0 ? "" : fileName.substring(fileExtensionSeparatorIndex + 1);
+
+        ImageDataProperty<String> fileNameWithoutExtensionProperty = new ImageDataProperty<>(fileNameWithoutExtension, false);
+        ImageDataProperty<String> fileExtensionProperty = new ImageDataProperty<>(fileExtension, false);
+        ImageDataProperty<String> fileNameProperty = new ImageDataProperty<>(fileName, false);
+        ChangeListener<String> fileNameChangeListener = (o, oldValue, newValue) -> {
+            StringBuilder newFileName = new StringBuilder();
+            newFileName.append(fileNameWithoutExtensionProperty.getNewValue().getValue());
+            if (StringUtils.isNotEmpty(fileExtensionProperty.getNewValue().getValue())) {
+                newFileName.append(".").append(fileExtensionProperty.getNewValue().getValue());
+            }
+            fileNameProperty.getNewValue().setValue(newFileName.toString());
+        };
+        fileNameWithoutExtensionProperty.getNewValue().addListener(fileNameChangeListener);
+        fileExtensionProperty.getNewValue().addListener(fileNameChangeListener);
+
         this.setOsFile(osFile);
-        this.setFileName(new ImageDataProperty<>(osFile.getName()));
-        this.setFileDate(new ImageDataProperty<>(Instant.ofEpochMilli(osFile.lastModified())));
+        this.setFileName(fileNameProperty);
+        this.setFileNameWithoutExtension(fileNameWithoutExtensionProperty);
+        this.setFileExtension(fileExtensionProperty);
+        this.setFileDate(new ImageDataProperty<>(Instant.ofEpochMilli(osFile.lastModified()), false));
 
         Map<ImageDataKey, ImageDataProperty<String>> properties = Arrays.stream(ImageDataKey.values())
-            .collect(Collectors.toMap(key -> key, key -> new ImageDataProperty<>(null)));
+            .collect(Collectors.toMap(key -> key, key -> new ImageDataProperty<>(null, true)));
         this.setProperties(properties);
 
         BooleanProperty dirtyProperty = new SimpleBooleanProperty();
         List<ObservableBooleanValue> dirtyProviders = new ArrayList<>();
-        dirtyProviders.add(this.getFileName().getDirty());
+        dirtyProviders.add(this.getFileNameWithoutExtension().getDirty());
+        dirtyProviders.add(this.getFileExtension().getDirty());
         dirtyProviders.add(this.getFileDate().getDirty());
         properties.forEach((key, value) -> dirtyProviders.add(value.getDirty()));
         this.setDirty(dirtyProperty);
@@ -84,9 +111,15 @@ class DefaultImageFile implements ImageFile {
         boolean fileUpdated = false;
         File osFile = this.getOsFile();
         if (this.getFileName().getDirty().get()) {
-            File newOsFile = new File(osFile.getParentFile(), this.getFileName().getNewValue().getValue());
+            String newFileName = this.getFileName().getNewValue().getValue();
+            int newFileExtensionSeparatorIndex = newFileName.lastIndexOf(".");
+            String newFileNameWithoutExtension = newFileExtensionSeparatorIndex < 0 ? "" : newFileName.substring(0, newFileExtensionSeparatorIndex);
+            String newFileExtension = newFileExtensionSeparatorIndex < 0 ? "" : newFileName.substring(newFileExtensionSeparatorIndex + 1);
+            File newOsFile = new File(osFile.getParentFile(), newFileName);
             osFile.renameTo(newOsFile);
-            this.getFileName().resetValue(this.getFileName().getNewValue().getValue());
+            this.getFileNameWithoutExtension().resetValue(newFileNameWithoutExtension);
+            this.getFileExtension().resetValue(newFileExtension);
+            this.getFileName().resetValue(newFileName);
             fileUpdated = true;
         }
         Instant newFileDate = this.getFileDate().getNewValue().getValue();
@@ -138,8 +171,24 @@ class DefaultImageFile implements ImageFile {
     public ImageDataProperty<String> getFileName() {
         return this.fileName;
     }
-    private void setFileName(ImageDataProperty<String> fileName) {
+    public void setFileName(ImageDataProperty<String> fileName) {
         this.fileName = fileName;
+    }
+
+    @Override
+    public ImageDataProperty<String> getFileNameWithoutExtension() {
+        return this.fileNameWithoutExtension;
+    }
+    private void setFileNameWithoutExtension(ImageDataProperty<String> fileNameWithoutExtension) {
+        this.fileNameWithoutExtension = fileNameWithoutExtension;
+    }
+
+    @Override
+    public ImageDataProperty<String> getFileExtension() {
+        return this.fileExtension;
+    }
+    private void setFileExtension(ImageDataProperty<String> fileExtension) {
+        this.fileExtension = fileExtension;
     }
 
     @Override

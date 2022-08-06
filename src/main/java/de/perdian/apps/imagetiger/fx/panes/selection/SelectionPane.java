@@ -18,9 +18,9 @@ package de.perdian.apps.imagetiger.fx.panes.selection;
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.panes.selection.actions.ActionsPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.data.DataPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.files.FileListPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.files.FileThumbnailsPane;
-import de.perdian.apps.imagetiger.fx.panes.selection.tags.TagsPane;
 import javafx.geometry.Insets;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
@@ -50,22 +50,21 @@ public class SelectionPane extends GridPane {
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
         actionsTitledPane.setFocusTraversable(false);
         actionsTitledPane.setCollapsible(false);
-        GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
 
-        TagsPane tagsPane = new TagsPane(selection);
-        tagsPane.disableProperty().bind(selection.getBusy());
-        tagsPane.setPadding(new Insets(10, 10, 10, 10));
-        TitledPane tagsTitledPane = new TitledPane("Tags", tagsPane);
-        tagsTitledPane.setFocusTraversable(false);
-        tagsTitledPane.setCollapsible(false);
-        GridPane.setHgrow(tagsTitledPane, Priority.ALWAYS);
+        DataPane dataPane = new DataPane(selection);
+        dataPane.disableProperty().bind(selection.getBusy());
+        dataPane.setPadding(new Insets(10, 10, 10, 10));
+        TitledPane dataTitledPane = new TitledPane("Data", dataPane);
+        dataTitledPane.setFocusTraversable(false);
+        dataTitledPane.setCollapsible(false);
+        GridPane.setHgrow(dataTitledPane, Priority.ALWAYS);
 
         this.setHgap(10);
         this.setVgap(10);
         this.add(fileListPane, 0, 0, 1, 1);
-        this.add(fileThumbnailsTitledPane, 1, 0, 1, 1);
-        this.add(actionsTitledPane, 0, 1, 2, 1);
-        this.add(tagsTitledPane, 0, 2, 2, 1);
+        this.add(actionsTitledPane, 0, 1, 1, 1);
+        this.add(fileThumbnailsTitledPane, 1, 0, 1, 2);
+        this.add(dataTitledPane, 0, 2, 2, 1);
 
     }
 

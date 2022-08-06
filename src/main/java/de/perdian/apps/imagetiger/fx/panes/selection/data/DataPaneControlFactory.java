@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.tags;
+package de.perdian.apps.imagetiger.fx.panes.selection.data;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -27,16 +27,17 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
-class TagsPaneControlFactory {
+class DataPaneControlFactory {
 
     private Selection selection = null;
 
-    TagsPaneControlFactory(Selection selection) {
+    DataPaneControlFactory(Selection selection) {
         this.setSelection(selection);
     }
 
@@ -55,8 +56,14 @@ class TagsPaneControlFactory {
         StringProperty controlProperty = this.bindImageDataProperty(propertyFunction, new SimpleStringProperty());
 
         TextField textField = new TextField();
-        textField.setOnKeyPressed(event -> this.handleOnKeyPressed(event));
+        textField.setOnKeyPressed(event -> this.handleOnKeyPressed(event, propertyFunction));
         textField.textProperty().bindBidirectional(controlProperty);
+        this.getSelection().getPrimaryImageFile().addListener((o, oldValue, newValue) -> {
+            if (!Objects.equals(oldValue, newValue)) {
+                textField.selectAll();
+            }
+        });
+
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
 
@@ -95,7 +102,7 @@ class TagsPaneControlFactory {
 
     }
 
-    private void handleOnKeyPressed(KeyEvent event) {
+    private void handleOnKeyPressed(KeyEvent event, Function<ImageFile, ImageDataProperty<String>> propertyFunction) {
         if (KeyCode.PAGE_UP.equals(event.getCode())) {
             int currentImageFileIndex = this.getSelection().getAvailableImageFiles().indexOf(this.getSelection().getPrimaryImageFile().getValue());
             int newImageFileIndex = (currentImageFileIndex - 1) % this.getSelection().getAvailableImageFiles().size();
@@ -109,6 +116,12 @@ class TagsPaneControlFactory {
             int newImageFileIndex = (currentImageFileIndex + 1) % this.getSelection().getAvailableImageFiles().size();
             ImageFile newPrimaryImageFile = this.getSelection().getAvailableImageFiles().get(newImageFileIndex);
             this.getSelection().getPrimaryImageFile().setValue(newPrimaryImageFile);
+        } else if (KeyCode.ESCAPE.equals(event.getCode())) {
+            ImageDataProperty<String> imageDataProperty = propertyFunction.apply(this.getSelection().getPrimaryImageFile().getValue());
+            imageDataProperty.getNewValue().setValue(imageDataProperty.getSavedValue().getValue());
+            if (event.getSource() instanceof TextInputControl) {
+                ((TextInputControl)event.getSource()).selectAll();
+            }
         }
     }
 

@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.tags;
+package de.perdian.apps.imagetiger.fx.panes.selection.data;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
-public class TagsPane extends GridPane {
+public class DataPane extends GridPane {
 
-    public TagsPane(Selection selection) {
+    public DataPane(Selection selection) {
 
-        TagsPaneControlFactory controlFactory = new TagsPaneControlFactory(selection);
+        DataPaneControlFactory controlFactory = new DataPaneControlFactory(selection);
+
+        TextField fileExtensionField = controlFactory.createTextField(imageFile -> imageFile.getFileExtension());
+        fileExtensionField.setPrefWidth(50);
+        GridPane.setHgrow(fileExtensionField, Priority.SOMETIMES);
 
         this.setHgap(10);
         this.setVgap(5);
         this.add(controlFactory.createLabel("File name"), 0, 0, 1, 1);
-        this.add(controlFactory.createTextField(imageFile -> imageFile.getFileName()), 1, 0, 1, 1);
+        this.add(controlFactory.createTextField(imageFile -> imageFile.getFileNameWithoutExtension()), 1, 0, 1, 1);
+        this.add(controlFactory.createLabel("File extension"), 2, 0, 1, 1);
+        this.add(fileExtensionField, 3, 0, 1, 1);
 
     }
 

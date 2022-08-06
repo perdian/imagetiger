@@ -61,7 +61,7 @@ class FileThumbnailPane extends GridPane {
 
         ToggleButton selectedButton = new ToggleButton("Selected");
         selectedButton.setGraphic(new FontIcon(MaterialDesignC.CHECKBOX_BLANK_OUTLINE));
-        selectedButton.selectedProperty().addListener((o, oldValue, newValue) -> selectedButton.setGraphic(new FontIcon(newValue ? MaterialDesignC.CHECKBOX_MARKED : MaterialDesignC.CHECKBOX_BLANK_OUTLINE)));
+        selectedButton.selectedProperty().addListener((o, oldValue, newValue) -> Platform.runLater(() -> selectedButton.setGraphic(new FontIcon(newValue ? MaterialDesignC.CHECKBOX_MARKED : MaterialDesignC.CHECKBOX_BLANK_OUTLINE))));
         selectedButton.focusedProperty().addListener((o, oldValue, newValue) -> {
             if (newValue) {
                 selection.getPrimaryImageFile().setValue(imageFile);

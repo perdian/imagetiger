@@ -29,13 +29,15 @@ public class ImageDataProperty<T> {
     private ObjectProperty<T> savedValueInternal = null;
     private ObjectProperty<T> newValueInternal = null;
     private ObservableBooleanValue dirty = null;
+    private boolean readOnly = false;
 
-    public ImageDataProperty(T initialValue) {
+    public ImageDataProperty(T initialValue, boolean readOnly) {
         ObjectProperty<T> savedValue = new SimpleObjectProperty<>(initialValue);
         ObjectProperty<T> newValue = new SimpleObjectProperty<>(initialValue);
         this.setDirty(Bindings.equal(savedValue, newValue).not());
         this.setSavedValueInternal(savedValue);
         this.setNewValueInternal(newValue);
+        this.setReadOnly(readOnly);
     }
 
     @Override
@@ -76,6 +78,13 @@ public class ImageDataProperty<T> {
     }
     private void setDirty(ObservableBooleanValue dirty) {
         this.dirty = dirty;
+    }
+
+    public boolean isReadOnly() {
+        return this.readOnly;
+    }
+    private void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 
 }

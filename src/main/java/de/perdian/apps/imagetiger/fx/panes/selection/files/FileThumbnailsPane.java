@@ -31,11 +31,14 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
-public class FileThumbnailsPane extends BorderPane {
+public class FileThumbnailsPane extends GridPane {
 
     public FileThumbnailsPane(Selection selection, ImageTigerPreferences preferences) {
 
@@ -48,6 +51,9 @@ public class FileThumbnailsPane extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setStyle("-fx-background-color:transparent;");
+        GridPane.setHgrow(scrollPane, Priority.ALWAYS);
+        GridPane.setVgrow(scrollPane, Priority.ALWAYS);
 
         int widthAndHeightDefault = 50;
         IntegerProperty widthAndHeightProperty = preferences.createIntegerProperty("fileThumbnails.widthAndHeight", widthAndHeightDefault);
@@ -63,12 +69,15 @@ public class FileThumbnailsPane extends BorderPane {
         });
 
         BorderPane settingsPane = new BorderPane();
-        settingsPane.setPadding(new Insets(7.5, 7.5, 7.5, 7.5));
+        settingsPane.setPadding(new Insets(10, 10, 10, 10));
         settingsPane.setLeft(new Label("Thumbnail width and height"));
         settingsPane.setCenter(widthAndHeightSlider);
 
-        this.setCenter(scrollPane);
-        this.setBottom(settingsPane);
+        Separator separatorPane = new Separator();
+
+        this.add(scrollPane, 0, 0, 1, 1);
+        this.add(separatorPane, 0, 1, 1, 1);
+        this.add(settingsPane, 0, 2, 1, 1);
 
         Executor thumnailsScalingExecutorTarget = Executors.newFixedThreadPool(5);
         selection.getAvailableImageFiles().addListener((ListChangeListener.Change<? extends ImageFile> change) -> {
