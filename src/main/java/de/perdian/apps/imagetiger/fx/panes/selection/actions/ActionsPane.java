@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.components.selection.actions;
+package de.perdian.apps.imagetiger.fx.panes.selection.actions;
 
 import java.util.ArrayList;
 import java.util.List;

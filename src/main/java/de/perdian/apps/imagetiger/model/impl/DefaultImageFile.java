@@ -71,7 +71,7 @@ class DefaultImageFile implements ImageFile {
                         newDirtyState = newDirtyState || dirtyProvider.get();
                     }
                 }
-                if (Objects.equals(dirtyProperty.get(), newDirtyState)) {
+                if (!Objects.equals(dirtyProperty.get(), newDirtyState)) {
                     dirtyProperty.setValue(newDirtyState);
                 }
             });

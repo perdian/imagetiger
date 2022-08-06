@@ -19,10 +19,10 @@ import java.io.File;
 import java.util.Objects;
 
 import de.perdian.apps.imagetiger.fx.actions.UpdateSelectionOnDirectoryChangeListener;
-import de.perdian.apps.imagetiger.fx.components.directories.DirectoryPane;
-import de.perdian.apps.imagetiger.fx.components.selection.SelectionPane;
-import de.perdian.apps.imagetiger.fx.components.status.StatusPane;
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.panes.directories.DirectoryPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.SelectionPane;
+import de.perdian.apps.imagetiger.fx.panes.status.StatusPane;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.fx.support.jobs.listeners.DisableWhileJobRunningJobListener;
 import javafx.beans.property.ObjectProperty;

@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.components.selection;
+package de.perdian.apps.imagetiger.fx.panes.selection;
 
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
-import de.perdian.apps.imagetiger.fx.components.selection.actions.ActionsPane;
-import de.perdian.apps.imagetiger.fx.components.selection.files.FileListPane;
-import de.perdian.apps.imagetiger.fx.components.selection.files.FileThumbnailsPane;
-import de.perdian.apps.imagetiger.fx.components.selection.tags.TagsPane;
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.panes.selection.actions.ActionsPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.files.FileListPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.files.FileThumbnailsPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.tags.TagsPane;
 import javafx.geometry.Insets;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
@@ -46,7 +46,7 @@ public class SelectionPane extends GridPane {
 
         ActionsPane actionsPane = new ActionsPane(selection);
         actionsPane.disableProperty().bind(selection.getBusy());
-        actionsPane.setPadding(new Insets(5, 5, 5, 5));
+        actionsPane.setPadding(new Insets(10, 10, 10, 10));
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
         actionsTitledPane.setFocusTraversable(false);
         actionsTitledPane.setCollapsible(false);
@@ -54,7 +54,7 @@ public class SelectionPane extends GridPane {
 
         TagsPane tagsPane = new TagsPane(selection);
         tagsPane.disableProperty().bind(selection.getBusy());
-        tagsPane.setPadding(new Insets(5, 5, 5, 5));
+        tagsPane.setPadding(new Insets(10, 10, 10, 10));
         TitledPane tagsTitledPane = new TitledPane("Tags", tagsPane);
         tagsTitledPane.setFocusTraversable(false);
         tagsTitledPane.setCollapsible(false);

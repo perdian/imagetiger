@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.components.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.files;
 
 import java.awt.image.BufferedImage;
 import java.util.Objects;

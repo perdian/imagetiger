@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.components.selection.tags;
+package de.perdian.apps.imagetiger.fx.panes.selection.tags;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
-public class TagsPane extends BorderPane {
+public class TagsPane extends GridPane {
 
     public TagsPane(Selection selection) {
+
+        TagsPaneControlFactory controlFactory = new TagsPaneControlFactory(selection);
+
+        this.setHgap(10);
+        this.setVgap(5);
+        this.add(controlFactory.createLabel("File name"), 0, 0, 1, 1);
+        this.add(controlFactory.createTextField(imageFile -> imageFile.getFileName()), 1, 0, 1, 1);
+
     }
 
 }
