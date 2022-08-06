@@ -27,7 +27,6 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
@@ -58,7 +57,7 @@ public class FileListTableView extends TableView<ImageFile> {
         focusColumn.setMaxWidth(25);
 
         TableColumn<ImageFile, String> fileNameColumn = new TableColumn<>("File name");
-        fileNameColumn.setCellValueFactory(callback -> new SimpleStringProperty(callback.getValue().toString()));
+        fileNameColumn.setCellValueFactory(callback -> callback.getValue().getFileName().getSavedValue());
 
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         this.getColumns().setAll(List.of(dirtyColumn, focusColumn, fileNameColumn));
