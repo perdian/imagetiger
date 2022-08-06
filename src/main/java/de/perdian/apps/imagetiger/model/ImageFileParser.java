@@ -16,11 +16,12 @@
 package de.perdian.apps.imagetiger.model;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface ImageFileParser {
 
     boolean isPotentialImageFile(File file);
 
-    ImageFile parseFile(File file);
+    ImageFile parseFile(File file) throws IOException;
 
 }

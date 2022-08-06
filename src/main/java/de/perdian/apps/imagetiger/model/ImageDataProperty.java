@@ -18,6 +18,7 @@ package de.perdian.apps.imagetiger.model;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -49,8 +50,10 @@ public class ImageDataProperty<T> {
     }
 
     public void resetValue(T value) {
-        this.getSavedValueInternal().setValue(value);
-        this.getNewValueInternal().setValue(value);
+        Platform.runLater(() -> {
+            this.getSavedValueInternal().setValue(value);
+            this.getNewValueInternal().setValue(value);
+        });
     }
 
     public ReadOnlyObjectProperty<T> getSavedValue() {

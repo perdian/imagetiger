@@ -15,30 +15,34 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.actions;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 
+import de.perdian.apps.imagetiger.fx.actions.SaveChangedFilesActionEventHandler;
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
+import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 
 public class ActionsPane extends BorderPane {
 
-    public ActionsPane(Selection selection) {
+    public ActionsPane(Selection selection, JobExecutor jobExecutor) {
 
-        Button selectButton = new Button("Select");
-        selectButton.setFocusTraversable(false);
-        selectButton.setOnAction(event -> {
-            List<ImageFile> allFiles = selection.getAvailableImageFiles();
-            if (allFiles.size() > 3) {
-                List<ImageFile> selectedFiles = new ArrayList<>();
-                selectedFiles.add(allFiles.get(0));
-                selectedFiles.add(allFiles.get(2));
-                selection.getSelectedImageFiles().setAll(selectedFiles);
-            }
-        });
-        this.setCenter(selectButton);
+        ObservableList<ImageFile> dirtyFiles = selection.getDirtyImageFiles();
+        Button saveChangedFilesButton = new Button("Save changed files", new FontIcon(MaterialDesignC.CONTENT_SAVE));
+        saveChangedFilesButton.setOnAction(new SaveChangedFilesActionEventHandler(dirtyFiles, jobExecutor));
+        saveChangedFilesButton.disableProperty().bind(Bindings.isEmpty(dirtyFiles));
+
+        FlowPane buttonPane = new FlowPane();
+        buttonPane.setPrefWidth(0);
+        buttonPane.setAlignment(Pos.CENTER);
+        buttonPane.getChildren().add(saveChangedFilesButton);
+        this.setCenter(buttonPane);
 
     }
 

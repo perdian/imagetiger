@@ -18,7 +18,10 @@ package de.perdian.apps.imagetiger.model.impl;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +32,13 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
+import de.perdian.apps.imagetiger.model.ImageTigerConstants;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,6 +46,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 
 class DefaultImageFile implements ImageFile {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultImageFile.class);
 
     private File osFile = null;
     private ReadOnlyBooleanProperty dirty = null;
@@ -49,9 +57,11 @@ class DefaultImageFile implements ImageFile {
     private ImageDataProperty<String> fileNameWithoutExtension = null;
     private ImageDataProperty<String> fileExtension = null;
     private ImageDataProperty<Instant> fileDate = null;
+    private ImageDataProperty<String> fileDateLocalString = null;
+    private ImageDataProperty<String> fileDateLocalZone = null;
     private Map<ImageDataKey, ImageDataProperty<String>> properties = null;
 
-    DefaultImageFile(File osFile) {
+    DefaultImageFile(File osFile) throws IOException {
 
         String fileName = osFile.getName();
         int fileExtensionSeparatorIndex = fileName.lastIndexOf(".");
@@ -72,11 +82,42 @@ class DefaultImageFile implements ImageFile {
         fileNameWithoutExtensionProperty.getNewValue().addListener(fileNameChangeListener);
         fileExtensionProperty.getNewValue().addListener(fileNameChangeListener);
 
+        Instant fileDate = Files.getLastModifiedTime(osFile.toPath()).toInstant();
+        ZoneId fileDateZoneId = ZoneId.systemDefault();
+        LocalDateTime fileDateLocal = fileDate.atZone(fileDateZoneId).toLocalDateTime();
+
+        ImageDataProperty<Instant> fileDateProperty = new ImageDataProperty<>(fileDate, false);
+        ImageDataProperty<String> fileDateLocalZone = new ImageDataProperty<>(fileDateZoneId.toString(), false);
+        ImageDataProperty<String> fileDateLocalAsStringProperty = new ImageDataProperty<>(ImageTigerConstants.DATE_TIME_FORMATTER.format(fileDateLocal), false);
+        fileDateLocalAsStringProperty.getNewValue().addListener((o, oldValue, newValue) -> {
+            try {
+                ZoneId newZoneId = ZoneId.of(fileDateLocalZone.getNewValue().getValue());
+                LocalDateTime newFileDateLocal = LocalDateTime.parse(newValue, ImageTigerConstants.DATE_TIME_FORMATTER);
+                Instant newFileDate = newFileDateLocal.atZone(newZoneId).toInstant();
+                fileDateProperty.getNewValue().setValue(newFileDate);
+            } catch (Exception e) {
+                log.debug("Invalid new local date: {}", newValue, e);
+            }
+        });
+        fileDateLocalZone.getNewValue().addListener((o, oldValue, newValue) -> {
+            try {
+                ZoneId newZoneId = ZoneId.of(newValue);
+                LocalDateTime newFileDateLocal = LocalDateTime.parse(fileDateLocalAsStringProperty.getNewValue().getValue(), ImageTigerConstants.DATE_TIME_FORMATTER);
+                Instant newFileDate = newFileDateLocal.atZone(newZoneId).toInstant();
+                fileDateProperty.getNewValue().setValue(newFileDate);
+            } catch (Exception e) {
+                log.debug("Invalid new local date zone: {}", newValue, e);
+            }
+        });
+        fileDateProperty.getSavedValue().addListener((o, oldValue, newValue) -> fileDateLocalAsStringProperty.resetValue(ImageTigerConstants.DATE_TIME_FORMATTER.format(newValue.atZone(ZoneId.of(fileDateLocalZone.getNewValue().getValue())))));
+
         this.setOsFile(osFile);
         this.setFileName(fileNameProperty);
         this.setFileNameWithoutExtension(fileNameWithoutExtensionProperty);
         this.setFileExtension(fileExtensionProperty);
-        this.setFileDate(new ImageDataProperty<>(Instant.ofEpochMilli(osFile.lastModified()), false));
+        this.setFileDate(fileDateProperty);
+        this.setFileDateLocalString(fileDateLocalAsStringProperty);
+        this.setFileDateLocalZone(fileDateLocalZone);
 
         Map<ImageDataKey, ImageDataProperty<String>> properties = Arrays.stream(ImageDataKey.values())
             .collect(Collectors.toMap(key -> key, key -> new ImageDataProperty<>(null, true)));
@@ -110,6 +151,7 @@ class DefaultImageFile implements ImageFile {
     public synchronized boolean updateOsFile() throws IOException {
         boolean fileUpdated = false;
         File osFile = this.getOsFile();
+        Instant osFileDate = Files.getLastModifiedTime(osFile.toPath()).toInstant();
         if (this.getFileName().getDirty().get()) {
             String newFileName = this.getFileName().getNewValue().getValue();
             int newFileExtensionSeparatorIndex = newFileName.lastIndexOf(".");
@@ -121,11 +163,13 @@ class DefaultImageFile implements ImageFile {
             this.getFileExtension().resetValue(newFileExtension);
             this.getFileName().resetValue(newFileName);
             fileUpdated = true;
+            this.setOsFile(newOsFile);
         }
         Instant newFileDate = this.getFileDate().getNewValue().getValue();
-        if (newFileDate.toEpochMilli() != osFile.lastModified()) {
+        if (!newFileDate.equals(osFileDate)) {
             osFile.setLastModified(newFileDate.toEpochMilli());
             fileUpdated = true;
+            this.getFileDate().resetValue(newFileDate);
         }
         this.getFileDate().resetValue(newFileDate);
         return fileUpdated;
@@ -197,6 +241,22 @@ class DefaultImageFile implements ImageFile {
     }
     private void setFileDate(ImageDataProperty<Instant> fileDate) {
         this.fileDate = fileDate;
+    }
+
+    @Override
+    public ImageDataProperty<String> getFileDateLocalString() {
+        return this.fileDateLocalString;
+    }
+    private void setFileDateLocalString(ImageDataProperty<String> fileDateLocalString) {
+        this.fileDateLocalString = fileDateLocalString;
+    }
+
+    @Override
+    public ImageDataProperty<String> getFileDateLocalZone() {
+        return this.fileDateLocalZone;
+    }
+    private void setFileDateLocalZone(ImageDataProperty<String> fileDateLocalZone) {
+        this.fileDateLocalZone = fileDateLocalZone;
     }
 
     void resetPropertyValue(ImageDataKey key, String value) {

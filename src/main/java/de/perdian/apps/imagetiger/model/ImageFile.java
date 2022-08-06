@@ -32,6 +32,8 @@ public interface ImageFile {
     ImageDataProperty<String> getFileNameWithoutExtension();
     ImageDataProperty<String> getFileExtension();
     ImageDataProperty<Instant> getFileDate();
+    ImageDataProperty<String> getFileDateLocalString();
+    ImageDataProperty<String> getFileDateLocalZone();
     Map<ImageDataKey, ImageDataProperty<String>> getProperties();
 
     boolean updateOsFile() throws IOException;

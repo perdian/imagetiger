@@ -23,6 +23,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 public class Selection {
@@ -32,15 +33,36 @@ public class Selection {
     private ObjectProperty<File> selectedDirectory = null;
     private ObservableList<ImageFile> availableImageFiles = null;
     private ObservableList<ImageFile> selectedImageFiles = null;
+    private ObservableList<ImageFile> dirtyImageFiles = null;
     private ObjectProperty<ImageFile> primaryImageFile = null;
 
     public Selection() {
+
+        ObservableList<ImageFile> dirtyImageFiles = FXCollections.observableArrayList();
+        ObservableList<ImageFile> availableImageFiles = FXCollections.observableArrayList();
+        availableImageFiles.addListener((ListChangeListener.Change<? extends ImageFile> change) -> {
+            while (change.next()) {
+                dirtyImageFiles.removeAll(change.getRemoved());
+                for (ImageFile newImageFile : change.getAddedSubList()) {
+                    newImageFile.getDirty().addListener((o, oldValue, newValue) -> {
+                        if (newValue) {
+                            dirtyImageFiles.add(newImageFile);
+                        } else {
+                            dirtyImageFiles.remove(newImageFile);
+                        }
+                    });
+                }
+            }
+        });
+
         this.setBusy(new SimpleBooleanProperty());
         this.setDirty(new SimpleBooleanProperty());
         this.setSelectedDirectory(new SimpleObjectProperty<>());
-        this.setAvailableImageFiles(FXCollections.observableArrayList());
+        this.setAvailableImageFiles(availableImageFiles);
+        this.setDirtyImageFiles(dirtyImageFiles);;
         this.setSelectedImageFiles(FXCollections.observableArrayList());
         this.setPrimaryImageFile(new SimpleObjectProperty<>());
+
     }
 
     public BooleanProperty getBusy() {
@@ -76,6 +98,13 @@ public class Selection {
     }
     private void setSelectedImageFiles(ObservableList<ImageFile> selectedImageFiles) {
         this.selectedImageFiles = selectedImageFiles;
+    }
+
+    public ObservableList<ImageFile> getDirtyImageFiles() {
+        return this.dirtyImageFiles;
+    }
+    public void setDirtyImageFiles(ObservableList<ImageFile> dirtyImageFiles) {
+        this.dirtyImageFiles = dirtyImageFiles;
     }
 
     public ObjectProperty<ImageFile> getPrimaryImageFile() {

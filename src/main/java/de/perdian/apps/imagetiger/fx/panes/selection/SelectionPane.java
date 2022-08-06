@@ -21,6 +21,7 @@ import de.perdian.apps.imagetiger.fx.panes.selection.actions.ActionsPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.data.DataPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.files.FileListPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.files.FileThumbnailsPane;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.geometry.Insets;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
@@ -28,7 +29,7 @@ import javafx.scene.layout.Priority;
 
 public class SelectionPane extends GridPane {
 
-    public SelectionPane(Selection selection, ImageTigerPreferences preferences) {
+    public SelectionPane(Selection selection, JobExecutor jobExecutor, ImageTigerPreferences preferences) {
 
         FileListPane fileListPane = new FileListPane(selection);
         fileListPane.disableProperty().bind(selection.getBusy());
@@ -44,7 +45,7 @@ public class SelectionPane extends GridPane {
         GridPane.setHgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
         GridPane.setVgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
 
-        ActionsPane actionsPane = new ActionsPane(selection);
+        ActionsPane actionsPane = new ActionsPane(selection, jobExecutor);
         actionsPane.disableProperty().bind(selection.getBusy());
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);

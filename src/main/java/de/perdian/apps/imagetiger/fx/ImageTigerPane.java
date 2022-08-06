@@ -36,11 +36,11 @@ class ImageTigerPane extends GridPane {
     ImageTigerPane(ImageTigerPreferences preferences) {
 
         Selection selection = new Selection();
-        SelectionPane selectionPane = new SelectionPane(selection, preferences);
-        GridPane.setHgrow(selectionPane, Priority.ALWAYS);
-
         JobExecutor jobExecutor = new JobExecutor();
         jobExecutor.addListener(new DisableWhileJobRunningJobListener(selection.getBusy()));
+
+        SelectionPane selectionPane = new SelectionPane(selection, jobExecutor, preferences);
+        GridPane.setHgrow(selectionPane, Priority.ALWAYS);
 
         DirectoryPane directoryPane = new DirectoryPane();
         directoryPane.setMinWidth(300);

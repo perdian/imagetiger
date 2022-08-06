@@ -16,6 +16,7 @@
 package de.perdian.apps.imagetiger.model.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +50,7 @@ public class DefaultImageFileParser implements ImageFileParser {
     }
 
     @Override
-    public ImageFile parseFile(File osFile) {
+    public ImageFile parseFile(File osFile) throws IOException {
         DefaultImageFile imageFile = new DefaultImageFile(osFile);
         this.appendMetadata(imageFile, osFile);
         return imageFile;

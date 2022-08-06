@@ -30,12 +30,19 @@ public class DataPane extends GridPane {
         fileExtensionField.setPrefWidth(50);
         GridPane.setHgrow(fileExtensionField, Priority.SOMETIMES);
 
+        TextField fileDateStringField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalString());
+        TextField fileDateZoneField = controlFactory.createTextField(imageFile -> imageFile.getFileDateLocalZone());
+
         this.setHgap(10);
         this.setVgap(5);
         this.add(controlFactory.createLabel("File name"), 0, 0, 1, 1);
         this.add(controlFactory.createTextField(imageFile -> imageFile.getFileNameWithoutExtension()), 1, 0, 1, 1);
-        this.add(controlFactory.createLabel("File extension"), 2, 0, 1, 1);
+        this.add(controlFactory.createLabel("."), 2, 0, 1, 1);
         this.add(fileExtensionField, 3, 0, 1, 1);
+        this.add(controlFactory.createLabel("File date"), 0, 1, 1, 1);
+        this.add(fileDateStringField, 1, 1, 3, 1);
+        this.add(controlFactory.createLabel("File date zone"), 0, 2, 1, 1);
+        this.add(fileDateZoneField, 1, 2, 3, 1);
 
     }
 
