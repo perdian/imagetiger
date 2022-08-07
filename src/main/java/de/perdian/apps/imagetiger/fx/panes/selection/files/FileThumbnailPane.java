@@ -15,7 +15,6 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.files;
 
-import java.awt.image.BufferedImage;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 
@@ -29,14 +28,13 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
@@ -47,7 +45,7 @@ class FileThumbnailPane extends GridPane {
 
     FileThumbnailPane(Selection selection, ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
 
-        Label imageLabel = new Label();
+        FileThumbnailImageLabel imageLabel = new FileThumbnailImageLabel(imageFile, widthAndHeightProperty, thumnailsScalingExecutor);
         imageLabel.setAlignment(Pos.CENTER);
         imageLabel.prefWidthProperty().bind(widthAndHeightProperty);
         imageLabel.prefHeightProperty().bind(widthAndHeightProperty);
@@ -57,7 +55,6 @@ class FileThumbnailPane extends GridPane {
                 selection.getPrimaryImageFile().setValue(imageFile);
             }
         });
-        this.updateImage(imageFile, imageLabel, widthAndHeightProperty, widthAndHeightProperty.intValue(), thumnailsScalingExecutor);
 
         ToggleButton selectedButton = new ToggleButton("Selected");
         selectedButton.setGraphic(new FontIcon(MaterialDesignC.CHECKBOX_BLANK_OUTLINE));
@@ -97,34 +94,12 @@ class FileThumbnailPane extends GridPane {
         this.onUpdatePrimaryImageFile(imageFile, selection.getPrimaryImageFile().getValue());
         selection.getPrimaryImageFile().addListener((o, oldValue, newValue) -> this.onUpdatePrimaryImageFile(imageFile, newValue));
 
-    }
-
-    private void updateImage(ImageFile imageFile, Label imageLabel, IntegerProperty widthAndHeightProperty, int widthAndHeight, Executor thumnailsScalingExecutor) {
-        thumnailsScalingExecutor.execute(() -> {
-            Platform.runLater(() -> imageLabel.setText("Loading image..."));
-            imageLabel.visibleProperty().addListener((o, oldValue, newValue) -> {
-                System.err.println("X: " + newValue);
-            });
-
-            // TODO: We cannot use the original image, we *have* to scale it so that we don't run into
-            //       an OutOfMemoryError!
-            try {
-                BufferedImage image = imageFile.loadBufferedImage();
-                ImageView imageView = new ImageView(SwingFXUtils.toFXImage(image, null));
-                imageView.setPreserveRatio(true);
-                imageView.fitWidthProperty().bind(widthAndHeightProperty);
-                imageView.fitHeightProperty().bind(widthAndHeightProperty);
-                Platform.runLater(() -> {
-                    imageLabel.setText("");
-                    imageLabel.setGraphic(imageView);
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    imageLabel.setGraphic(null);
-                    imageLabel.setText("Cannot load image!");
-                });
+        this.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                selection.getPrimaryImageFile().setValue(imageFile);
             }
         });
+
     }
 
     private void onUpdateSelectedImageFiles(ImageFile imageFile, ObservableList<? extends ImageFile> selectedImageFiles) {

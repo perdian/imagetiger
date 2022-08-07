@@ -15,10 +15,10 @@
  */
 package de.perdian.apps.imagetiger.model.impl;
 
+import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -52,8 +52,6 @@ class DefaultImageFile implements ImageFile {
 
     private File osFile = null;
     private ReadOnlyBooleanProperty dirty = null;
-    private SoftReference<BufferedImage> cachedBufferedImage = null;
-    private Exception cachedBufferedImageException = null;
     private ImageDataProperty<String> fileName = null;
     private ImageDataProperty<String> fileNameWithoutExtension = null;
     private ImageDataProperty<String> fileExtension = null;
@@ -178,21 +176,15 @@ class DefaultImageFile implements ImageFile {
 
     @Override
     public synchronized BufferedImage loadBufferedImage() throws Exception {
-        if (this.cachedBufferedImageException != null) {
-            throw this.cachedBufferedImageException;
-        } else {
-            BufferedImage resolvedImage = this.cachedBufferedImage == null ? null : this.cachedBufferedImage.get();
-            if (resolvedImage == null) {
-                try {
-                    resolvedImage = ImageIO.read(this.getOsFile());
-                    this.cachedBufferedImage = new SoftReference<>(resolvedImage);
-                } catch (Exception e) {
-                    log.debug("Cannot load image", e);
-                    this.cachedBufferedImageException = e;
-                    throw e;
-                }
-            }
-            return resolvedImage;
+        return ImageIO.read(this.getOsFile());
+    }
+
+    @Override
+    public void openInNativeViewer() {
+        try {
+            Desktop.getDesktop().open(this.getOsFile());
+        } catch (Exception e) {
+            log.warn("Cannot open file in native viewer: {}", this.getOsFile(), e);
         }
     }
 

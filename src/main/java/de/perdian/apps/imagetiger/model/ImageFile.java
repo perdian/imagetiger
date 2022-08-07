@@ -40,5 +40,6 @@ public interface ImageFile {
 
     boolean updateOsFile() throws IOException;
 
+    void openInNativeViewer();
 
 }
