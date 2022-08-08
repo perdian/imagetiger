@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.list;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import javafx.scene.layout.BorderPane;
 
-public class FileListPane extends BorderPane {
+public class ListPane extends BorderPane {
 
-    public FileListPane(Selection selection) {
-        FileListTableView fileListTableView = new FileListTableView(selection);
-        fileListTableView.setFocusTraversable(false);
-        this.setCenter(fileListTableView);
+    public ListPane(Selection selection) {
+        ListTableView listTableView = new ListTableView(selection);
+        listTableView.setFocusTraversable(false);
+        this.setCenter(listTableView);
     }
 
 }

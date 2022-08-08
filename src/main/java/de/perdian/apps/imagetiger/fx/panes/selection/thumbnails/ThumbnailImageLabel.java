@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.thumbnails;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -28,11 +28,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 
-class FileThumbnailImageLabel extends Label {
+class ThumbnailImageLabel extends Label {
 
     private Image currentImage = null;
 
-    FileThumbnailImageLabel(ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
+    ThumbnailImageLabel(ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
         this.minWidthProperty().bind(this.prefWidthProperty());
         this.minHeightProperty().bind(this.prefHeightProperty());
         this.maxWidthProperty().bind(this.prefWidthProperty());

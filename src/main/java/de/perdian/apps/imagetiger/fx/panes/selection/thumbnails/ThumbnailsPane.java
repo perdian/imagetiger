@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.thumbnails;
 
 import java.io.File;
 import java.util.List;
@@ -38,9 +38,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
-public class FileThumbnailsPane extends GridPane {
+public class ThumbnailsPane extends GridPane {
 
-    public FileThumbnailsPane(Selection selection, ImageTigerPreferences preferences) {
+    public ThumbnailsPane(Selection selection, ImageTigerPreferences preferences) {
 
         FlowPane flowPane = new FlowPane();
         flowPane.setPadding(new Insets(10, 10, 10, 10));
@@ -89,8 +89,8 @@ public class FileThumbnailsPane extends GridPane {
                 }
             };
 
-            List<FileThumbnailPane> thumbnailPanes = change.getList().stream()
-                .map(imageFile -> new FileThumbnailPane(selection, imageFile, widthAndHeightProperty, thumnailsScalingExecutor))
+            List<ThumbnailPane> thumbnailPanes = change.getList().stream()
+                .map(imageFile -> new ThumbnailPane(selection, imageFile, widthAndHeightProperty, thumnailsScalingExecutor))
                 .toList();
 
             Platform.runLater(() -> flowPane.getChildren().setAll(thumbnailPanes));

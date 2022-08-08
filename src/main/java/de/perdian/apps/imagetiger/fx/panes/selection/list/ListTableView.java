@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.list;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,9 +35,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
-public class FileListTableView extends TableView<ImageFile> {
+public class ListTableView extends TableView<ImageFile> {
 
-    FileListTableView(Selection selection) {
+    ListTableView(Selection selection) {
         super(selection.getAvailableImageFiles());
 
         TableColumn<ImageFile, Boolean> dirtyColumn = new TableColumn<>("");

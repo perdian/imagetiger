@@ -19,8 +19,8 @@ import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.panes.selection.actions.ActionsPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.data.DataPane;
-import de.perdian.apps.imagetiger.fx.panes.selection.files.FileListPane;
-import de.perdian.apps.imagetiger.fx.panes.selection.files.FileThumbnailsPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.list.ListPane;
+import de.perdian.apps.imagetiger.fx.panes.selection.thumbnails.ThumbnailsPane;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.geometry.Insets;
 import javafx.scene.control.TitledPane;
@@ -31,13 +31,13 @@ public class SelectionPane extends GridPane {
 
     public SelectionPane(Selection selection, JobExecutor jobExecutor, ImageTigerPreferences preferences) {
 
-        FileListPane fileListPane = new FileListPane(selection);
-        fileListPane.disableProperty().bind(selection.getBusy());
-        GridPane.setVgrow(fileListPane, Priority.ALWAYS);
+        ListPane listPane = new ListPane(selection);
+        listPane.disableProperty().bind(selection.getBusy());
+        GridPane.setVgrow(listPane, Priority.ALWAYS);
 
-        FileThumbnailsPane fileThumbnailsPane = new FileThumbnailsPane(selection, preferences);
-        fileThumbnailsPane.disableProperty().bind(selection.getBusy());
-        TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", fileThumbnailsPane);
+        ThumbnailsPane thumbnailsPane = new ThumbnailsPane(selection, preferences);
+        thumbnailsPane.disableProperty().bind(selection.getBusy());
+        TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", thumbnailsPane);
         fileThumbnailsTitledPane.setFocusTraversable(false);
         fileThumbnailsTitledPane.setCollapsible(false);
         fileThumbnailsTitledPane.setMaxHeight(Double.MAX_VALUE);
@@ -62,7 +62,7 @@ public class SelectionPane extends GridPane {
 
         this.setHgap(10);
         this.setVgap(10);
-        this.add(fileListPane, 0, 0, 1, 1);
+        this.add(listPane, 0, 0, 1, 1);
         this.add(actionsTitledPane, 0, 1, 1, 1);
         this.add(fileThumbnailsTitledPane, 1, 0, 1, 2);
         this.add(dataTitledPane, 0, 2, 2, 1);

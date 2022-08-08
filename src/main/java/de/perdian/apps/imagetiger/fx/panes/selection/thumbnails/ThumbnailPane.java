@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.files;
+package de.perdian.apps.imagetiger.fx.panes.selection.thumbnails;
 
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -41,11 +41,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 
-class FileThumbnailPane extends GridPane {
+class ThumbnailPane extends GridPane {
 
-    FileThumbnailPane(Selection selection, ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
+    ThumbnailPane(Selection selection, ImageFile imageFile, IntegerProperty widthAndHeightProperty, Executor thumnailsScalingExecutor) {
 
-        FileThumbnailImageLabel imageLabel = new FileThumbnailImageLabel(imageFile, widthAndHeightProperty, thumnailsScalingExecutor);
+        ThumbnailImageLabel imageLabel = new ThumbnailImageLabel(imageFile, widthAndHeightProperty, thumnailsScalingExecutor);
         imageLabel.setAlignment(Pos.CENTER);
         imageLabel.prefWidthProperty().bind(widthAndHeightProperty);
         imageLabel.prefHeightProperty().bind(widthAndHeightProperty);
