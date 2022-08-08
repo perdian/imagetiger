@@ -95,7 +95,7 @@ public class ListTableView extends TableView<ImageFile> {
         this.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> {
             if (!tableViewSelectionListenerActive.get()) {
                 if (!Objects.equals(newValue, selection.getPrimaryImageFile().getValue())) {
-                    selection.getPrimaryImageFile().setValue(newValue);
+                    selection.updatePrimaryImageFile(newValue);
                 }
             }
         });

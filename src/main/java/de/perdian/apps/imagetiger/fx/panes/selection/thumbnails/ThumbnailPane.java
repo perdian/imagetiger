@@ -52,7 +52,7 @@ class ThumbnailPane extends GridPane {
         imageLabel.setBorder(Border.stroke(Color.rgb(224, 224, 224)));
         imageLabel.focusedProperty().addListener((o, oldValue, newValue) -> {
             if (newValue) {
-                selection.getPrimaryImageFile().setValue(imageFile);
+                selection.updatePrimaryImageFile(imageFile);
             }
         });
 
@@ -61,7 +61,7 @@ class ThumbnailPane extends GridPane {
         selectedButton.selectedProperty().addListener((o, oldValue, newValue) -> Platform.runLater(() -> selectedButton.setGraphic(new FontIcon(newValue ? MaterialDesignC.CHECKBOX_MARKED : MaterialDesignC.CHECKBOX_BLANK_OUTLINE))));
         selectedButton.focusedProperty().addListener((o, oldValue, newValue) -> {
             if (newValue) {
-                selection.getPrimaryImageFile().setValue(imageFile);
+                selection.updatePrimaryImageFile(imageFile);
             }
         });
         GridPane.setHalignment(selectedButton, HPos.CENTER);
@@ -96,7 +96,7 @@ class ThumbnailPane extends GridPane {
 
         this.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                selection.getPrimaryImageFile().setValue(imageFile);
+                selection.updatePrimaryImageFile(imageFile);
             }
         });
 

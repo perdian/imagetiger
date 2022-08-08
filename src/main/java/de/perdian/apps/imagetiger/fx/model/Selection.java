@@ -32,6 +32,8 @@ import de.perdian.apps.imagetiger.model.ImageFileParser;
 import de.perdian.apps.imagetiger.model.impl.DefaultImageFileParser;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -45,10 +47,10 @@ public class Selection {
     private BooleanProperty busy = null;
     private BooleanProperty dirty = null;
     private ObjectProperty<File> selectedDirectory = null;
+    private ObjectProperty<ImageFile> primaryImageFile = null;
     private ObservableList<ImageFile> availableImageFiles = null;
     private ObservableList<ImageFile> selectedImageFiles = null;
     private ObservableList<ImageFile> dirtyImageFiles = null;
-    private ObjectProperty<ImageFile> primaryImageFile = null;
     private JobExecutor jobExecutor = null;
     private ImageFileParser imageFileParser = new DefaultImageFileParser();
 
@@ -87,14 +89,22 @@ public class Selection {
             List<ImageFile> imageFiles = this.parseImageFiles(newDirectory, context);
             synchronized (this) {
                 if (!context.isCancelled()) {
-                    this.getPrimaryImageFile().setValue(null);
-                    this.getSelectedDirectory().setValue(newDirectory);
-                    this.getSelectedImageFiles().clear();
-                    this.getDirtyImageFiles().clear();
-                    this.getAvailableImageFiles().setAll(imageFiles);
+                    this.primaryImageFile.setValue(null);
+                    this.selectedDirectory.setValue(newDirectory);
+                    this.selectedImageFiles.clear();
+                    this.dirtyImageFiles.clear();
+                    this.availableImageFiles.setAll(imageFiles);
                 }
             }
         });
+    }
+
+    public void updatePrimaryImageFile(ImageFile newPrimaryImageFile) {
+        if (this.availableImageFiles.contains(newPrimaryImageFile)) {
+            this.primaryImageFile.setValue(newPrimaryImageFile);
+        } else {
+            this.primaryImageFile.setValue(null);
+        }
     }
 
     public void saveDirtyFiles() {
@@ -150,25 +160,32 @@ public class Selection {
 
     }
 
-    public BooleanProperty getBusy() {
+    public ReadOnlyBooleanProperty getBusy() {
         return this.busy;
     }
     private void setBusy(BooleanProperty busy) {
         this.busy = busy;
     }
 
-    public BooleanProperty getDirty() {
+    public ReadOnlyBooleanProperty getDirty() {
         return this.dirty;
     }
     private void setDirty(BooleanProperty dirty) {
         this.dirty = dirty;
     }
 
-    public ObjectProperty<File> getSelectedDirectory() {
+    public ReadOnlyObjectProperty<File> getSelectedDirectory() {
         return this.selectedDirectory;
     }
     private void setSelectedDirectory(ObjectProperty<File> selectedDirectory) {
         this.selectedDirectory = selectedDirectory;
+    }
+
+    public ReadOnlyObjectProperty<ImageFile> getPrimaryImageFile() {
+        return this.primaryImageFile;
+    }
+    private void setPrimaryImageFile(ObjectProperty<ImageFile> primaryImageFile) {
+        this.primaryImageFile = primaryImageFile;
     }
 
     public ObservableList<ImageFile> getAvailableImageFiles() {
@@ -190,13 +207,6 @@ public class Selection {
     }
     private void setDirtyImageFiles(ObservableList<ImageFile> dirtyImageFiles) {
         this.dirtyImageFiles = dirtyImageFiles;
-    }
-
-    public ObjectProperty<ImageFile> getPrimaryImageFile() {
-        return this.primaryImageFile;
-    }
-    private void setPrimaryImageFile(ObjectProperty<ImageFile> primaryImageFile) {
-        this.primaryImageFile = primaryImageFile;
     }
 
     private JobExecutor getJobExecutor() {

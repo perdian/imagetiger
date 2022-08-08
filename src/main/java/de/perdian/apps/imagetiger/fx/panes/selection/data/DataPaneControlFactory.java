@@ -113,12 +113,12 @@ class DataPaneControlFactory {
                 newImageFileIndex = this.getSelection().getAvailableImageFiles().size() + newImageFileIndex;
             }
             ImageFile newPrimaryImageFile = this.getSelection().getAvailableImageFiles().get(newImageFileIndex);
-            this.getSelection().getPrimaryImageFile().setValue(newPrimaryImageFile);
+            this.getSelection().updatePrimaryImageFile(newPrimaryImageFile);
         } else if (KeyCode.PAGE_DOWN.equals(event.getCode())) {
             int currentImageFileIndex = this.getSelection().getAvailableImageFiles().indexOf(this.getSelection().getPrimaryImageFile().getValue());
             int newImageFileIndex = (currentImageFileIndex + 1) % this.getSelection().getAvailableImageFiles().size();
             ImageFile newPrimaryImageFile = this.getSelection().getAvailableImageFiles().get(newImageFileIndex);
-            this.getSelection().getPrimaryImageFile().setValue(newPrimaryImageFile);
+            this.getSelection().updatePrimaryImageFile(newPrimaryImageFile);
         } else if (KeyCode.ESCAPE.equals(event.getCode())) {
             ImageDataProperty<String> imageDataProperty = propertyFunction.apply(this.getSelection().getPrimaryImageFile().getValue());
             imageDataProperty.getNewValue().setValue(imageDataProperty.getSavedValue().getValue());
