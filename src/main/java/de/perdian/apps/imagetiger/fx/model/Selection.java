@@ -108,7 +108,7 @@ public class Selection {
     }
 
     public void saveDirtyFiles() {
-        List<ImageFile> dirtyImageFiles = this.getDirtyImageFiles();
+        List<ImageFile> dirtyImageFiles = new ArrayList<>(this.getDirtyImageFiles());
         if (!dirtyImageFiles.isEmpty()) {
             this.getJobExecutor().executeJob(jobContext -> {
                 synchronized (this) {
