@@ -35,7 +35,7 @@ public class SelectionPane extends GridPane {
         listPane.disableProperty().bind(selection.getBusy());
         GridPane.setVgrow(listPane, Priority.ALWAYS);
 
-        ThumbnailsPane thumbnailsPane = new ThumbnailsPane(selection, preferences);
+        ThumbnailsPane thumbnailsPane = new ThumbnailsPane(selection, jobExecutor, preferences);
         thumbnailsPane.disableProperty().bind(selection.getBusy());
         TitledPane fileThumbnailsTitledPane = new TitledPane("Thumbnails", thumbnailsPane);
         fileThumbnailsTitledPane.setFocusTraversable(false);
@@ -45,7 +45,7 @@ public class SelectionPane extends GridPane {
         GridPane.setHgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
         GridPane.setVgrow(fileThumbnailsTitledPane, Priority.ALWAYS);
 
-        ActionsPane actionsPane = new ActionsPane(selection, jobExecutor);
+        ActionsPane actionsPane = new ActionsPane(selection);
         actionsPane.disableProperty().bind(selection.getBusy());
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);

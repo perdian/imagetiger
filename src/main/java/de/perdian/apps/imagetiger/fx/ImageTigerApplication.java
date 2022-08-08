@@ -15,9 +15,6 @@
  */
 package de.perdian.apps.imagetiger.fx;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,17 +32,8 @@ public class ImageTigerApplication extends Application {
 
     @Override
     public void init() throws Exception {
-        log.info("Initialzing application");
-
         log.debug("Loading preferences");
-        Path userHomePath = Path.of(System.getProperty("user.home"), ".imagetiger");
-        if (!Files.exists(userHomePath)) {
-            log.debug("Creating new preferences directory in user home: {}", userHomePath);
-            Files.createDirectories(userHomePath);
-        } else {
-            log.debug("Using preferences directory in user home: {}", userHomePath);
-        }
-        this.setPreferences(new ImageTigerPreferences(userHomePath));
+        this.setPreferences(ImageTigerPreferences.createFromUserHome());
     }
 
     @Override

@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -40,7 +41,7 @@ import javafx.scene.layout.Priority;
 
 public class ThumbnailsPane extends GridPane {
 
-    public ThumbnailsPane(Selection selection, ImageTigerPreferences preferences) {
+    public ThumbnailsPane(Selection selection, JobExecutor jobExecutor, ImageTigerPreferences preferences) {
 
         FlowPane flowPane = new FlowPane();
         flowPane.setPadding(new Insets(10, 10, 10, 10));
@@ -79,7 +80,7 @@ public class ThumbnailsPane extends GridPane {
         this.add(separatorPane, 0, 1, 1, 1);
         this.add(settingsPane, 0, 2, 1, 1);
 
-        this.setOnContextMenuRequested(new ThumbnailsPaneContextMenuEventHandler(this, selection));
+        this.setOnContextMenuRequested(new ThumbnailsPaneContextMenuEventHandler(this, selection, jobExecutor));
 
         Executor thumnailsScalingExecutorTarget = Executors.newFixedThreadPool(5);
         selection.getAvailableImageFiles().addListener((ListChangeListener.Change<? extends ImageFile> change) -> {

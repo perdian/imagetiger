@@ -18,9 +18,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.actions;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 
-import de.perdian.apps.imagetiger.fx.actions.SaveChangedFilesActionEventHandler;
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -31,11 +29,11 @@ import javafx.scene.layout.FlowPane;
 
 public class ActionsPane extends BorderPane {
 
-    public ActionsPane(Selection selection, JobExecutor jobExecutor) {
+    public ActionsPane(Selection selection) {
 
         ObservableList<ImageFile> dirtyFiles = selection.getDirtyImageFiles();
         Button saveChangedFilesButton = new Button("Save changed files", new FontIcon(MaterialDesignC.CONTENT_SAVE));
-        saveChangedFilesButton.setOnAction(new SaveChangedFilesActionEventHandler(dirtyFiles, jobExecutor));
+        saveChangedFilesButton.setOnAction(event -> selection.saveDirtyFiles());
         saveChangedFilesButton.disableProperty().bind(Bindings.isEmpty(dirtyFiles));
 
         FlowPane buttonPane = new FlowPane();

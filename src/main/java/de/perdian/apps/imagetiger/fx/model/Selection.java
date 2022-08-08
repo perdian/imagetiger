@@ -16,9 +16,20 @@
 package de.perdian.apps.imagetiger.fx.model;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.perdian.apps.imagetiger.fx.support.jobs.JobContext;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
+import de.perdian.apps.imagetiger.model.ImageFileParser;
+import de.perdian.apps.imagetiger.model.impl.DefaultImageFileParser;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -29,15 +40,19 @@ import javafx.collections.ObservableList;
 
 public class Selection {
 
-    private BooleanProperty busy = new SimpleBooleanProperty(false);
-    private BooleanProperty dirty = new SimpleBooleanProperty(false);
+    private static final Logger log = LoggerFactory.getLogger(Selection.class);
+
+    private BooleanProperty busy = null;
+    private BooleanProperty dirty = null;
     private ObjectProperty<File> selectedDirectory = null;
     private ObservableList<ImageFile> availableImageFiles = null;
     private ObservableList<ImageFile> selectedImageFiles = null;
     private ObservableList<ImageFile> dirtyImageFiles = null;
     private ObjectProperty<ImageFile> primaryImageFile = null;
+    private JobExecutor jobExecutor = null;
+    private ImageFileParser imageFileParser = new DefaultImageFileParser();
 
-    public Selection() {
+    public Selection(BooleanProperty busyProperty, JobExecutor jobExecutor) {
 
         ObservableList<ImageFile> dirtyImageFiles = FXCollections.observableArrayList();
         ObservableList<ImageFile> availableImageFiles = FXCollections.observableArrayList();
@@ -56,22 +71,83 @@ public class Selection {
             }
         });
 
-        this.setBusy(new SimpleBooleanProperty());
+        this.setBusy(busyProperty);
         this.setDirty(new SimpleBooleanProperty());
         this.setSelectedDirectory(new SimpleObjectProperty<>());
         this.setAvailableImageFiles(availableImageFiles);
         this.setDirtyImageFiles(dirtyImageFiles);;
         this.setSelectedImageFiles(FXCollections.observableArrayList());
         this.setPrimaryImageFile(new SimpleObjectProperty<>());
+        this.setJobExecutor(jobExecutor);
 
     }
 
-    public synchronized void updateSelectedDirectory(File selectedDirectory, List<ImageFile> directoryImageFiles) {
-        this.getPrimaryImageFile().setValue(null);
-        this.getSelectedDirectory().setValue(selectedDirectory);
-        this.getSelectedImageFiles().clear();
-        this.getDirtyImageFiles().clear();
-        this.getAvailableImageFiles().setAll(directoryImageFiles);
+    public void updateSelectedDirectory(File newDirectory) {
+        this.getJobExecutor().executeJob(context -> {
+            List<ImageFile> imageFiles = this.parseImageFiles(newDirectory, context);
+            synchronized (this) {
+                if (!context.isCancelled()) {
+                    this.getPrimaryImageFile().setValue(null);
+                    this.getSelectedDirectory().setValue(newDirectory);
+                    this.getSelectedImageFiles().clear();
+                    this.getDirtyImageFiles().clear();
+                    this.getAvailableImageFiles().setAll(imageFiles);
+                }
+            }
+        });
+    }
+
+    public void saveDirtyFiles() {
+        List<ImageFile> dirtyImageFiles = this.getDirtyImageFiles();
+        if (!dirtyImageFiles.isEmpty()) {
+            this.getJobExecutor().executeJob(jobContext -> {
+                synchronized (this) {
+                    log.info("Saving {} dirty files", dirtyImageFiles.size());
+                    jobContext.updateProgress("Saving " + dirtyImageFiles.size() + " dity files", 0, dirtyImageFiles.size());
+                    for (int i=0; i < dirtyImageFiles.size() && !jobContext.isCancelled(); i++) {
+                        ImageFile dirtyFile = dirtyImageFiles.get(i);
+                        jobContext.updateProgress("Saving dirty file: " + dirtyFile.getFileName().getSavedValue().getValue(), i + 1, dirtyImageFiles.size());
+                        try {
+                            dirtyFile.updateOsFile();
+                        } catch (Exception e) {
+                            log.error("Cannot save dirty file: " + dirtyFile.getFileName().getSavedValue().getValue(), e);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private List<ImageFile> parseImageFiles(File directory, JobContext jobContext) {
+
+        List<File> potentialImageFiles = Arrays.stream(directory.listFiles())
+            .filter(file -> file.isFile())
+            .filter(file -> !file.isHidden())
+            .filter(file -> this.getImageFileParser().isPotentialImageFile(file))
+            .sorted((f1, f2) -> f1.getName().compareToIgnoreCase(f2.getName()))
+            .toList();
+
+        if (potentialImageFiles.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            jobContext.updateProgress("Processed " + potentialImageFiles.size() + " image files", 0, potentialImageFiles.size());
+            List<ImageFile> imageFiles = new ArrayList<>(potentialImageFiles.size());
+            for (int i=0; i < potentialImageFiles.size() && !jobContext.isCancelled(); i++) {
+                File potentialImageFile = potentialImageFiles.get(i);
+                jobContext.updateProgress("Processing image file: " + potentialImageFile.getName(), i, potentialImageFiles.size());
+                try {
+                    ImageFile imageFile = this.getImageFileParser().parseFile(potentialImageFile);
+                    if (imageFile != null) {
+                        imageFiles.add(imageFile);
+                    }
+                } catch (IOException e) {
+                    log.warn("Cannot process image file at: " + potentialImageFile.getAbsolutePath(), e);
+                }
+            }
+            jobContext.updateProgress("Analyzed " + imageFiles.size() + " image files", potentialImageFiles.size(), potentialImageFiles.size());
+            return imageFiles;
+        }
+
     }
 
     public BooleanProperty getBusy() {
@@ -112,15 +188,29 @@ public class Selection {
     public ObservableList<ImageFile> getDirtyImageFiles() {
         return this.dirtyImageFiles;
     }
-    public void setDirtyImageFiles(ObservableList<ImageFile> dirtyImageFiles) {
+    private void setDirtyImageFiles(ObservableList<ImageFile> dirtyImageFiles) {
         this.dirtyImageFiles = dirtyImageFiles;
     }
 
     public ObjectProperty<ImageFile> getPrimaryImageFile() {
         return this.primaryImageFile;
     }
-    public void setPrimaryImageFile(ObjectProperty<ImageFile> primaryImageFile) {
+    private void setPrimaryImageFile(ObjectProperty<ImageFile> primaryImageFile) {
         this.primaryImageFile = primaryImageFile;
+    }
+
+    private JobExecutor getJobExecutor() {
+        return this.jobExecutor;
+    }
+    private void setJobExecutor(JobExecutor jobExecutor) {
+        this.jobExecutor = jobExecutor;
+    }
+
+    ImageFileParser getImageFileParser() {
+        return this.imageFileParser;
+    }
+    void setImageFileParser(ImageFileParser imageFileParser) {
+        this.imageFileParser = imageFileParser;
     }
 
 }

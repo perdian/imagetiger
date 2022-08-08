@@ -25,6 +25,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+
 public class JobExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
@@ -32,6 +36,10 @@ public class JobExecutor {
     private Executor executor = Executors.newCachedThreadPool();
     private AtomicLong jobCounter = new AtomicLong();
     private JobContextImpl currentJobContext = null;
+
+    public JobExecutor(BooleanProperty busyProperty) {
+        this.addListener(new UpdateBusyPropertyWhileJobRunningJobListener(busyProperty));
+    }
 
     /**
      * Executes the given job with a separate thread. All registered listeners
@@ -76,9 +84,34 @@ public class JobExecutor {
         Optional.ofNullable(this.getCurrentJobContext()).ifPresent(jobContext -> jobContext.setCancelled(true));
     }
 
-    // -------------------------------------------------------------------------
-    // --- Property access methods ---------------------------------------------
-    // -------------------------------------------------------------------------
+    private static class UpdateBusyPropertyWhileJobRunningJobListener implements JobListener {
+
+        private Property<Boolean> busyProperty = null;
+
+        public UpdateBusyPropertyWhileJobRunningJobListener(Property<Boolean> busyProperty) {
+            this.setBusyProperty(busyProperty);
+        }
+
+        @Override
+        public void jobStarted(Job job) {
+            Platform.runLater(() -> this.getBusyProperty().setValue(Boolean.TRUE));
+        }
+
+        @Override
+        public void jobCompleted(Job job, boolean otherJobsActive) {
+            if (!otherJobsActive) {
+                Platform.runLater(() -> this.getBusyProperty().setValue(Boolean.FALSE));
+            }
+        }
+
+        private Property<Boolean> getBusyProperty() {
+            return this.busyProperty;
+        }
+        private void setBusyProperty(Property<Boolean> busyProperty) {
+            this.busyProperty = busyProperty;
+        }
+
+    }
 
     public void addListener(JobListener listener) {
         this.getListeners().add(listener);

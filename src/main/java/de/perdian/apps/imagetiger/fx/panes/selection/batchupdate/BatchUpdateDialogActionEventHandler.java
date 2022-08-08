@@ -13,45 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.thumbnails;
-
-import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
+package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateDialogActionEventHandler;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.stage.Window;
 
-class ThumbnailsPaneContextMenuEventHandler implements EventHandler<ContextMenuEvent> {
+public class BatchUpdateDialogActionEventHandler implements EventHandler<ActionEvent> {
 
     private Node parentNode = null;
     private Selection selection = null;
     private JobExecutor jobExecutor = null;
 
-    ThumbnailsPaneContextMenuEventHandler(Node parentNode, Selection selection, JobExecutor jobExecutor) {
+    public BatchUpdateDialogActionEventHandler(Node parentNode, Selection selection, JobExecutor jobExecutor) {
         this.setParentNode(parentNode);
         this.setSelection(selection);
         this.setJobExecutor(jobExecutor);
-
     }
 
     @Override
-    public void handle(ContextMenuEvent event) {
-
-        MenuItem batchUpdateMenuItem = new MenuItem("Batch update", new FontIcon(MaterialDesignF.FOLDER_TABLE_OUTLINE));
-        batchUpdateMenuItem.setOnAction(new BatchUpdateDialogActionEventHandler(this.getParentNode(), this.getSelection(), this.getJobExecutor()));
-
-        Window ownerWindow = this.getParentNode().getScene().getWindow();
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().add(batchUpdateMenuItem);
-        contextMenu.show(ownerWindow, event.getScreenX(), event.getScreenY());
-
+    public void handle(ActionEvent event) {
+        BatchUpdateDialog dialog = new BatchUpdateDialog(this.getParentNode().getScene().getWindow(), this.getSelection(), this.getJobExecutor());
+        dialog.show();
     }
 
     private Node getParentNode() {

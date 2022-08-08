@@ -18,6 +18,7 @@ package de.perdian.apps.imagetiger.fx;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -63,6 +64,18 @@ public class ImageTigerPreferences {
         this.setPropertyValues(propertyValues);
         this.setPropertyValuesPath(propertyValuesFile);
         this.setProperties(new HashMap<>());
+
+    }
+
+    public static ImageTigerPreferences createFromUserHome() throws IOException {
+        Path userHomePath = Path.of(System.getProperty("user.home"), ".imagetiger");
+        if (!Files.exists(userHomePath)) {
+            log.debug("Creating new preferences directory in user home: {}", userHomePath);
+            Files.createDirectories(userHomePath);
+        } else {
+            log.debug("Using preferences directory in user home: {}", userHomePath);
+        }
+        return new ImageTigerPreferences(userHomePath);
     }
 
     public ObjectProperty<File> createFileProperty(String propertyName, File defaultValue) {
