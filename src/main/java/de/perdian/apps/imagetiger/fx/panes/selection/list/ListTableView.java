@@ -19,21 +19,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.kordamp.ikonli.Ikon;
-import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.support.tables.TableViewHelper;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.util.Callback;
 
 public class ListTableView extends TableView<ImageFile> {
 
@@ -42,7 +38,7 @@ public class ListTableView extends TableView<ImageFile> {
 
         TableColumn<ImageFile, Boolean> dirtyColumn = new TableColumn<>("");
         dirtyColumn.setCellValueFactory(callback -> callback.getValue().getDirty());
-        dirtyColumn.setCellFactory(this.createIconCellCallback(MaterialDesignF.FLAG, null));
+        dirtyColumn.setCellFactory(TableViewHelper.createIconCellCallback(MaterialDesignF.FLAG, null));
         dirtyColumn.setSortable(false);
         dirtyColumn.setReorderable(false);
         dirtyColumn.setMinWidth(25);
@@ -50,7 +46,7 @@ public class ListTableView extends TableView<ImageFile> {
 
         TableColumn<ImageFile, Boolean> focusColumn = new TableColumn<>("");
         focusColumn.setCellValueFactory(callback -> Bindings.equal(selection.getPrimaryImageFile(), callback.getValue()));
-        focusColumn.setCellFactory(this.createIconCellCallback(MaterialDesignA.ARROW_RIGHT_BOLD, null));
+        focusColumn.setCellFactory(TableViewHelper.createIconCellCallback(MaterialDesignA.ARROW_RIGHT_BOLD, null));
         focusColumn.setSortable(false);
         focusColumn.setReorderable(false);
         focusColumn.setMinWidth(25);
@@ -102,23 +98,5 @@ public class ListTableView extends TableView<ImageFile> {
 
     }
 
-    private Callback<TableColumn<ImageFile, Boolean>, TableCell<ImageFile, Boolean>> createIconCellCallback(Ikon trueIcon, Ikon falseIcon) {
-        return column -> {
-            TableCell<ImageFile, Boolean> tableCell = new TableCell<>() {
-                @Override protected void updateItem(Boolean item, boolean empty) {
-                    if (!empty) {
-                        if (item != null && item.booleanValue()) {
-                            this.setGraphic(trueIcon == null ? null : new Label("", new FontIcon(trueIcon)));
-                        } else {
-                            this.setGraphic(falseIcon == null ? null : new Label("", new FontIcon(falseIcon)));
-                        }
-                    } else {
-                        this.setGraphic(null);
-                    }
-                }
-            };
-            return tableCell;
-        };
-    }
 
 }

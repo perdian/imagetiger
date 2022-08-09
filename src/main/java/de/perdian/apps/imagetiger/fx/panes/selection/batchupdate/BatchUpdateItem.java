@@ -15,24 +15,46 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
+import java.util.List;
+
 import de.perdian.apps.imagetiger.model.ImageFile;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.StringProperty;
+import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 class BatchUpdateItem {
 
     private ImageFile imageFile = null;
-    private ReadOnlyStringProperty originalFileNameProperty = null;
-    private StringProperty newFileNameProperty = null;
-    private ReadOnlyStringProperty originalFileExtensionProperty = null;
-    private StringProperty newFileExtensionProperty = null;
-    private ReadOnlyStringProperty originalFileDateLocalStringProperty = null;
-    private StringProperty newFileDateLocalStringProperty = null;
-    private ReadOnlyStringProperty originalFileDateLocalZoneProperty = null;
-    private StringProperty newFileDateLocalZoneProperty = null;
+    private ChangeTrackingProperty<String> fileName = null;
+    private ChangeTrackingProperty<String> fileNameWithoutExtension = null;
+    private ChangeTrackingProperty<String> fileExtension = null;
+    private ChangeTrackingProperty<String> fileDateLocalString = null;
+    private ChangeTrackingProperty<String> fileDateLocalZone = null;
+    private ReadOnlyBooleanProperty dirty = null;
 
     BatchUpdateItem(ImageFile imageFile) {
         this.setImageFile(imageFile);
+
+        ChangeTrackingProperty<String> fileName = new ChangeTrackingProperty<>(imageFile.getFileName().getOriginalValue().getValue());
+        ChangeTrackingProperty<String> fileNameWithoutExtension = new ChangeTrackingProperty<>(imageFile.getFileNameWithoutExtension().getOriginalValue().getValue());
+        ChangeTrackingProperty<String> fileExtension = new ChangeTrackingProperty<>(imageFile.getFileExtension().getOriginalValue().getValue());
+        ChangeTrackingProperty<String> fileDateLocalString = new ChangeTrackingProperty<>(imageFile.getFileDateLocalString().getOriginalValue().getValue());
+        ChangeTrackingProperty<String> fileDateLocalZone = new ChangeTrackingProperty<>(imageFile.getFileDateLocalZone().getOriginalValue().getValue());
+
+        BooleanProperty dirtyProperty = new SimpleBooleanProperty(false);
+        List<ChangeTrackingProperty<?>> dirtyCheckingProperties = List.of(fileName, fileNameWithoutExtension, fileExtension, fileDateLocalString, fileDateLocalZone);
+        dirtyCheckingProperties.forEach(property -> property.getDirty().addListener((o, oldValue, newValue) -> {
+            dirtyProperty.setValue(dirtyCheckingProperties.stream().map(p -> p.getDirty().getValue()).findAny().orElse(false));
+        }));
+
+        this.setFileName(fileName);
+        this.setFileNameWithoutExtension(fileNameWithoutExtension);
+        this.setFileExtension(fileExtension);
+        this.setFileDateLocalString(fileDateLocalString);
+        this.setFileDateLocalZone(fileDateLocalZone);
+        this.setDirty(dirtyProperty);
+
     }
 
     ImageFile getImageFile() {
@@ -42,60 +64,46 @@ class BatchUpdateItem {
         this.imageFile = imageFile;
     }
 
-    ReadOnlyStringProperty getOriginalFileNameProperty() {
-        return this.originalFileNameProperty;
+    ChangeTrackingProperty<String> getFileName() {
+        return this.fileName;
     }
-    private void setOriginalFileNameProperty(ReadOnlyStringProperty originalFileNameProperty) {
-        this.originalFileNameProperty = originalFileNameProperty;
-    }
-
-    StringProperty getNewFileNameProperty() {
-        return this.newFileNameProperty;
-    }
-    private void setNewFileNameProperty(StringProperty newFileNameProperty) {
-        this.newFileNameProperty = newFileNameProperty;
+    private void setFileName(ChangeTrackingProperty<String> fileName) {
+        this.fileName = fileName;
     }
 
-    ReadOnlyStringProperty getOriginalFileExtensionProperty() {
-        return this.originalFileExtensionProperty;
+    ChangeTrackingProperty<String> getFileNameWithoutExtension() {
+        return this.fileNameWithoutExtension;
     }
-    private void setOriginalFileExtensionProperty(ReadOnlyStringProperty originalFileExtensionProperty) {
-        this.originalFileExtensionProperty = originalFileExtensionProperty;
-    }
-
-    StringProperty getNewFileExtensionProperty() {
-        return this.newFileExtensionProperty;
-    }
-    private void setNewFileExtensionProperty(StringProperty newFileExtensionProperty) {
-        this.newFileExtensionProperty = newFileExtensionProperty;
+    private void setFileNameWithoutExtension(ChangeTrackingProperty<String> fileNameWithoutExtension) {
+        this.fileNameWithoutExtension = fileNameWithoutExtension;
     }
 
-    ReadOnlyStringProperty getOriginalFileDateLocalStringProperty() {
-        return this.originalFileDateLocalStringProperty;
+    ChangeTrackingProperty<String> getFileExtension() {
+        return this.fileExtension;
     }
-    private void setOriginalFileDateLocalStringProperty(ReadOnlyStringProperty originalFileDateLocalStringProperty) {
-        this.originalFileDateLocalStringProperty = originalFileDateLocalStringProperty;
-    }
-
-    StringProperty getNewFileDateLocalStringProperty() {
-        return this.newFileDateLocalStringProperty;
-    }
-    private void setNewFileDateLocalStringProperty(StringProperty newFileDateLocalStringProperty) {
-        this.newFileDateLocalStringProperty = newFileDateLocalStringProperty;
+    private void setFileExtension(ChangeTrackingProperty<String> fileExtension) {
+        this.fileExtension = fileExtension;
     }
 
-    ReadOnlyStringProperty getOriginalFileDateLocalZoneProperty() {
-        return this.originalFileDateLocalZoneProperty;
+    ChangeTrackingProperty<String> getFileDateLocalString() {
+        return this.fileDateLocalString;
     }
-    private void setOriginalFileDateLocalZoneProperty(ReadOnlyStringProperty originalFileDateLocalZoneProperty) {
-        this.originalFileDateLocalZoneProperty = originalFileDateLocalZoneProperty;
+    private void setFileDateLocalString(ChangeTrackingProperty<String> fileDateLocalString) {
+        this.fileDateLocalString = fileDateLocalString;
     }
 
-    StringProperty getNewFileDateLocalZoneProperty() {
-        return this.newFileDateLocalZoneProperty;
+    ChangeTrackingProperty<String> getFileDateLocalZone() {
+        return this.fileDateLocalZone;
     }
-    private void setNewFileDateLocalZoneProperty(StringProperty newFileDateLocalZoneProperty) {
-        this.newFileDateLocalZoneProperty = newFileDateLocalZoneProperty;
+    private void setFileDateLocalZone(ChangeTrackingProperty<String> fileDateLocalZone) {
+        this.fileDateLocalZone = fileDateLocalZone;
+    }
+
+    ReadOnlyBooleanProperty getDirty() {
+        return this.dirty;
+    }
+    private void setDirty(ReadOnlyBooleanProperty dirty) {
+        this.dirty = dirty;
     }
 
 }
