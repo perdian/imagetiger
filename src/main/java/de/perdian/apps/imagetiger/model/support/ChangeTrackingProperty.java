@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.model;
+package de.perdian.apps.imagetiger.model.support;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -25,45 +25,43 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 
-public class ImageDataProperty<T> {
+public class ChangeTrackingProperty<T> {
 
-    private ObjectProperty<T> savedValueInternal = null;
+    private ObjectProperty<T> originalValueInternal = null;
     private ObjectProperty<T> newValueInternal = null;
     private ObservableBooleanValue dirty = null;
-    private boolean readOnly = false;
 
-    public ImageDataProperty(T initialValue, boolean readOnly) {
-        ObjectProperty<T> savedValue = new SimpleObjectProperty<>(initialValue);
+    public ChangeTrackingProperty(T initialValue) {
+        ObjectProperty<T> originalValue = new SimpleObjectProperty<>(initialValue);
         ObjectProperty<T> newValue = new SimpleObjectProperty<>(initialValue);
-        this.setDirty(Bindings.equal(savedValue, newValue).not());
-        this.setSavedValueInternal(savedValue);
+        this.setDirty(Bindings.equal(originalValue, newValue).not());
+        this.setOriginalValueInternal(originalValue);
         this.setNewValueInternal(newValue);
-        this.setReadOnly(readOnly);
     }
 
     @Override
     public String toString() {
         ToStringBuilder toStringBuilder = new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE);
-        toStringBuilder.append("saved", this.getSavedValue().getValue());
+        toStringBuilder.append("original", this.getOriginalValue().getValue());
         toStringBuilder.append("new", this.getNewValue().getValue());
         return toStringBuilder.toString();
     }
 
     public void resetValue(T value) {
         Platform.runLater(() -> {
-            this.getSavedValueInternal().setValue(value);
+            this.getOriginalValueInternal().setValue(value);
             this.getNewValueInternal().setValue(value);
         });
     }
 
-    public ReadOnlyObjectProperty<T> getSavedValue() {
-        return this.getSavedValueInternal();
+    public ReadOnlyObjectProperty<T> getOriginalValue() {
+        return this.getOriginalValueInternal();
     }
-    private ObjectProperty<T> getSavedValueInternal() {
-        return this.savedValueInternal;
+    private ObjectProperty<T> getOriginalValueInternal() {
+        return this.originalValueInternal;
     }
-    private void setSavedValueInternal(ObjectProperty<T> savedValueInternal) {
-        this.savedValueInternal = savedValueInternal;
+    private void setOriginalValueInternal(ObjectProperty<T> originalValueInternal) {
+        this.originalValueInternal = originalValueInternal;
     }
 
     public ObjectProperty<T> getNewValue() {
@@ -81,13 +79,6 @@ public class ImageDataProperty<T> {
     }
     private void setDirty(ObservableBooleanValue dirty) {
         this.dirty = dirty;
-    }
-
-    public boolean isReadOnly() {
-        return this.readOnly;
-    }
-    private void setReadOnly(boolean readOnly) {
-        this.readOnly = readOnly;
     }
 
 }

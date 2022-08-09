@@ -57,7 +57,7 @@ public class ListTableView extends TableView<ImageFile> {
         focusColumn.setMaxWidth(25);
 
         TableColumn<ImageFile, String> fileNameColumn = new TableColumn<>("File name");
-        fileNameColumn.setCellValueFactory(callback -> callback.getValue().getFileName().getSavedValue());
+        fileNameColumn.setCellValueFactory(callback -> callback.getValue().getFileName().getOriginalValue());
 
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         this.getColumns().setAll(List.of(dirtyColumn, focusColumn, fileNameColumn));

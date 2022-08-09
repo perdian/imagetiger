@@ -24,6 +24,7 @@ import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -58,6 +59,7 @@ public class BatchUpdateDialogPaneLauncher {
             selection.updateSelectedDirectory(directory);
 
             BatchUpdateDialogPane primaryPane = new BatchUpdateDialogPane(selection, jobExecutor);
+            primaryPane.setPadding(new Insets(10, 10, 10, 10));
             primaryPane.setPrefSize(1600, 1200);
 
             Scene primaryScene = new Scene(primaryPane);

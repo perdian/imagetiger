@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 
+import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 public interface ImageFile {
@@ -28,15 +29,15 @@ public interface ImageFile {
 
     ReadOnlyBooleanProperty getDirty();
 
-    ImageDataProperty<String> getFileName();
-    ImageDataProperty<String> getFileNameWithoutExtension();
-    ImageDataProperty<String> getFileExtension();
-    ImageDataProperty<Instant> getFileDate();
-    ImageDataProperty<String> getFileDateLocalString();
-    ImageDataProperty<String> getFileDateLocalZone();
+    ChangeTrackingProperty<String> getFileName();
+    ChangeTrackingProperty<String> getFileNameWithoutExtension();
+    ChangeTrackingProperty<String> getFileExtension();
+    ChangeTrackingProperty<Instant> getFileDate();
+    ChangeTrackingProperty<String> getFileDateLocalString();
+    ChangeTrackingProperty<String> getFileDateLocalZone();
 
-    ImageDataProperty<String> getProperty(ImageDataKey key);
-    Map<ImageDataKey, ImageDataProperty<String>> getProperties();
+    ChangeTrackingProperty<String> getProperty(ImageDataKey key);
+    Map<ImageDataKey, ChangeTrackingProperty<String>> getProperties();
 
     boolean updateOsFile() throws IOException;
 

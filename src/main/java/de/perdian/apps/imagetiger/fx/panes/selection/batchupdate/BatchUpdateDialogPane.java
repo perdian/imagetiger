@@ -17,14 +17,28 @@ package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
-import javafx.scene.layout.BorderPane;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
-class BatchUpdateDialogPane extends BorderPane {
+class BatchUpdateDialogPane extends GridPane {
 
     private Selection selection = null;
     private JobExecutor jobExecutor = null;
 
     BatchUpdateDialogPane(Selection selection, JobExecutor jobExecutor) {
+
+        ObservableList<BatchUpdateItem> items = FXCollections.observableArrayList();
+        items.setAll(selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList());
+
+        BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(items);
+        GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
+        GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
+
+        this.add(itemsTableView, 0, 0, 1, 1);
+
+
         this.setSelection(selection);
         this.setJobExecutor(jobExecutor);
     }

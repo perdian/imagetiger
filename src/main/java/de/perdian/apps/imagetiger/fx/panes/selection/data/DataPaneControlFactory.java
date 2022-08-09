@@ -19,8 +19,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
+import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -47,14 +47,14 @@ class DataPaneControlFactory {
         return label;
     }
 
-    TextField createTextField(Function<ImageFile, ImageDataProperty<String>> propertyFunction, boolean editable) {
+    TextField createTextField(Function<ImageFile, ChangeTrackingProperty<String>> propertyFunction, boolean editable) {
         TextField textField = this.createTextFieldBasics(propertyFunction);
         textField.disableProperty().bind(this.getSelection().getPrimaryImageFile().isNull());
         textField.editableProperty().bind(new SimpleBooleanProperty(editable));
         return textField;
     }
 
-    private TextField createTextFieldBasics(Function<ImageFile, ImageDataProperty<String>> propertyFunction) {
+    private TextField createTextFieldBasics(Function<ImageFile, ChangeTrackingProperty<String>> propertyFunction) {
         StringProperty controlProperty = this.bindImageDataProperty(propertyFunction, new SimpleStringProperty());
 
         TextField textField = new TextField();
@@ -72,7 +72,7 @@ class DataPaneControlFactory {
 
     }
 
-    private <T extends Property<U>, U> T bindImageDataProperty(Function<ImageFile, ImageDataProperty<U>> imageDataPropertyFunction, T fxProperty) {
+    private <T extends Property<U>, U> T bindImageDataProperty(Function<ImageFile, ChangeTrackingProperty<U>> imageDataPropertyFunction, T fxProperty) {
 
         ChangeListener<U> updateFxPropertyChangeListener = (o, oldValue, newValue) -> {
             if (!Objects.equals(fxProperty.getValue(), newValue)) {
@@ -105,7 +105,7 @@ class DataPaneControlFactory {
 
     }
 
-    private void handleOnKeyPressed(KeyEvent event, Function<ImageFile, ImageDataProperty<String>> propertyFunction) {
+    private void handleOnKeyPressed(KeyEvent event, Function<ImageFile, ChangeTrackingProperty<String>> propertyFunction) {
         if (KeyCode.PAGE_UP.equals(event.getCode())) {
             int currentImageFileIndex = this.getSelection().getAvailableImageFiles().indexOf(this.getSelection().getPrimaryImageFile().getValue());
             int newImageFileIndex = (currentImageFileIndex - 1) % this.getSelection().getAvailableImageFiles().size();
@@ -120,8 +120,8 @@ class DataPaneControlFactory {
             ImageFile newPrimaryImageFile = this.getSelection().getAvailableImageFiles().get(newImageFileIndex);
             this.getSelection().updatePrimaryImageFile(newPrimaryImageFile);
         } else if (KeyCode.ESCAPE.equals(event.getCode())) {
-            ImageDataProperty<String> imageDataProperty = propertyFunction.apply(this.getSelection().getPrimaryImageFile().getValue());
-            imageDataProperty.getNewValue().setValue(imageDataProperty.getSavedValue().getValue());
+            ChangeTrackingProperty<String> imageDataProperty = propertyFunction.apply(this.getSelection().getPrimaryImageFile().getValue());
+            imageDataProperty.getNewValue().setValue(imageDataProperty.getOriginalValue().getValue());
             if (event.getSource() instanceof TextInputControl) {
                 ((TextInputControl)event.getSource()).selectAll();
             }

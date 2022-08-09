@@ -116,11 +116,11 @@ public class Selection {
                     jobContext.updateProgress("Saving " + dirtyImageFiles.size() + " dity files", 0, dirtyImageFiles.size());
                     for (int i=0; i < dirtyImageFiles.size() && !jobContext.isCancelled(); i++) {
                         ImageFile dirtyFile = dirtyImageFiles.get(i);
-                        jobContext.updateProgress("Saving dirty file: " + dirtyFile.getFileName().getSavedValue().getValue(), i + 1, dirtyImageFiles.size());
+                        jobContext.updateProgress("Saving dirty file: " + dirtyFile.getFileName().getOriginalValue().getValue(), i + 1, dirtyImageFiles.size());
                         try {
                             dirtyFile.updateOsFile();
                         } catch (Exception e) {
-                            log.error("Cannot save dirty file: " + dirtyFile.getFileName().getSavedValue().getValue(), e);
+                            log.error("Cannot save dirty file: " + dirtyFile.getFileName().getOriginalValue().getValue(), e);
                         }
                     }
                 }

@@ -37,9 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.perdian.apps.imagetiger.model.ImageDataKey;
-import de.perdian.apps.imagetiger.model.ImageDataProperty;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageTigerConstants;
+import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -52,13 +52,13 @@ class DefaultImageFile implements ImageFile {
 
     private File osFile = null;
     private ReadOnlyBooleanProperty dirty = null;
-    private ImageDataProperty<String> fileName = null;
-    private ImageDataProperty<String> fileNameWithoutExtension = null;
-    private ImageDataProperty<String> fileExtension = null;
-    private ImageDataProperty<Instant> fileDate = null;
-    private ImageDataProperty<String> fileDateLocalString = null;
-    private ImageDataProperty<String> fileDateLocalZone = null;
-    private Map<ImageDataKey, ImageDataProperty<String>> properties = null;
+    private ChangeTrackingProperty<String> fileName = null;
+    private ChangeTrackingProperty<String> fileNameWithoutExtension = null;
+    private ChangeTrackingProperty<String> fileExtension = null;
+    private ChangeTrackingProperty<Instant> fileDate = null;
+    private ChangeTrackingProperty<String> fileDateLocalString = null;
+    private ChangeTrackingProperty<String> fileDateLocalZone = null;
+    private Map<ImageDataKey, ChangeTrackingProperty<String>> properties = null;
 
     DefaultImageFile(File osFile) throws IOException {
 
@@ -67,9 +67,9 @@ class DefaultImageFile implements ImageFile {
         String fileNameWithoutExtension = fileExtensionSeparatorIndex < 0 ? "" : fileName.substring(0, fileExtensionSeparatorIndex);
         String fileExtension = fileExtensionSeparatorIndex < 0 ? "" : fileName.substring(fileExtensionSeparatorIndex + 1);
 
-        ImageDataProperty<String> fileNameWithoutExtensionProperty = new ImageDataProperty<>(fileNameWithoutExtension, false);
-        ImageDataProperty<String> fileExtensionProperty = new ImageDataProperty<>(fileExtension, false);
-        ImageDataProperty<String> fileNameProperty = new ImageDataProperty<>(fileName, false);
+        ChangeTrackingProperty<String> fileNameWithoutExtensionProperty = new ChangeTrackingProperty<>(fileNameWithoutExtension);
+        ChangeTrackingProperty<String> fileExtensionProperty = new ChangeTrackingProperty<>(fileExtension);
+        ChangeTrackingProperty<String> fileNameProperty = new ChangeTrackingProperty<>(fileName);
         ChangeListener<String> fileNameChangeListener = (o, oldValue, newValue) -> {
             StringBuilder newFileName = new StringBuilder();
             newFileName.append(fileNameWithoutExtensionProperty.getNewValue().getValue());
@@ -85,9 +85,9 @@ class DefaultImageFile implements ImageFile {
         ZoneId fileDateZoneId = ZoneId.systemDefault();
         LocalDateTime fileDateLocal = fileDate.atZone(fileDateZoneId).toLocalDateTime();
 
-        ImageDataProperty<Instant> fileDateProperty = new ImageDataProperty<>(fileDate, false);
-        ImageDataProperty<String> fileDateLocalZone = new ImageDataProperty<>(fileDateZoneId.toString(), false);
-        ImageDataProperty<String> fileDateLocalAsStringProperty = new ImageDataProperty<>(ImageTigerConstants.DATE_TIME_FORMATTER.format(fileDateLocal), false);
+        ChangeTrackingProperty<Instant> fileDateProperty = new ChangeTrackingProperty<>(fileDate);
+        ChangeTrackingProperty<String> fileDateLocalZone = new ChangeTrackingProperty<>(fileDateZoneId.toString());
+        ChangeTrackingProperty<String> fileDateLocalAsStringProperty = new ChangeTrackingProperty<>(ImageTigerConstants.DATE_TIME_FORMATTER.format(fileDateLocal));
         fileDateLocalAsStringProperty.getNewValue().addListener((o, oldValue, newValue) -> {
             try {
                 ZoneId newZoneId = ZoneId.of(fileDateLocalZone.getNewValue().getValue());
@@ -108,7 +108,7 @@ class DefaultImageFile implements ImageFile {
                 log.debug("Invalid new local date zone: {}", newValue, e);
             }
         });
-        fileDateProperty.getSavedValue().addListener((o, oldValue, newValue) -> fileDateLocalAsStringProperty.resetValue(ImageTigerConstants.DATE_TIME_FORMATTER.format(newValue.atZone(ZoneId.of(fileDateLocalZone.getNewValue().getValue())))));
+        fileDateProperty.getOriginalValue().addListener((o, oldValue, newValue) -> fileDateLocalAsStringProperty.resetValue(ImageTigerConstants.DATE_TIME_FORMATTER.format(newValue.atZone(ZoneId.of(fileDateLocalZone.getNewValue().getValue())))));
 
         this.setOsFile(osFile);
         this.setFileName(fileNameProperty);
@@ -118,8 +118,8 @@ class DefaultImageFile implements ImageFile {
         this.setFileDateLocalString(fileDateLocalAsStringProperty);
         this.setFileDateLocalZone(fileDateLocalZone);
 
-        Map<ImageDataKey, ImageDataProperty<String>> properties = Arrays.stream(ImageDataKey.values())
-            .collect(Collectors.toMap(key -> key, key -> new ImageDataProperty<>(null, true)));
+        Map<ImageDataKey, ChangeTrackingProperty<String>> properties = Arrays.stream(ImageDataKey.values())
+            .collect(Collectors.toMap(key -> key, key -> new ChangeTrackingProperty<>(null)));
         this.setProperties(properties);
 
         BooleanProperty dirtyProperty = new SimpleBooleanProperty();
@@ -209,50 +209,50 @@ class DefaultImageFile implements ImageFile {
     }
 
     @Override
-    public ImageDataProperty<String> getFileName() {
+    public ChangeTrackingProperty<String> getFileName() {
         return this.fileName;
     }
-    public void setFileName(ImageDataProperty<String> fileName) {
+    public void setFileName(ChangeTrackingProperty<String> fileName) {
         this.fileName = fileName;
     }
 
     @Override
-    public ImageDataProperty<String> getFileNameWithoutExtension() {
+    public ChangeTrackingProperty<String> getFileNameWithoutExtension() {
         return this.fileNameWithoutExtension;
     }
-    private void setFileNameWithoutExtension(ImageDataProperty<String> fileNameWithoutExtension) {
+    private void setFileNameWithoutExtension(ChangeTrackingProperty<String> fileNameWithoutExtension) {
         this.fileNameWithoutExtension = fileNameWithoutExtension;
     }
 
     @Override
-    public ImageDataProperty<String> getFileExtension() {
+    public ChangeTrackingProperty<String> getFileExtension() {
         return this.fileExtension;
     }
-    private void setFileExtension(ImageDataProperty<String> fileExtension) {
+    private void setFileExtension(ChangeTrackingProperty<String> fileExtension) {
         this.fileExtension = fileExtension;
     }
 
     @Override
-    public ImageDataProperty<Instant> getFileDate() {
+    public ChangeTrackingProperty<Instant> getFileDate() {
         return this.fileDate;
     }
-    private void setFileDate(ImageDataProperty<Instant> fileDate) {
+    private void setFileDate(ChangeTrackingProperty<Instant> fileDate) {
         this.fileDate = fileDate;
     }
 
     @Override
-    public ImageDataProperty<String> getFileDateLocalString() {
+    public ChangeTrackingProperty<String> getFileDateLocalString() {
         return this.fileDateLocalString;
     }
-    private void setFileDateLocalString(ImageDataProperty<String> fileDateLocalString) {
+    private void setFileDateLocalString(ChangeTrackingProperty<String> fileDateLocalString) {
         this.fileDateLocalString = fileDateLocalString;
     }
 
     @Override
-    public ImageDataProperty<String> getFileDateLocalZone() {
+    public ChangeTrackingProperty<String> getFileDateLocalZone() {
         return this.fileDateLocalZone;
     }
-    private void setFileDateLocalZone(ImageDataProperty<String> fileDateLocalZone) {
+    private void setFileDateLocalZone(ChangeTrackingProperty<String> fileDateLocalZone) {
         this.fileDateLocalZone = fileDateLocalZone;
     }
 
@@ -261,15 +261,15 @@ class DefaultImageFile implements ImageFile {
     }
 
     @Override
-    public ImageDataProperty<String> getProperty(ImageDataKey key) {
+    public ChangeTrackingProperty<String> getProperty(ImageDataKey key) {
         return this.getProperties().get(key);
     }
 
     @Override
-    public Map<ImageDataKey, ImageDataProperty<String>> getProperties() {
+    public Map<ImageDataKey, ChangeTrackingProperty<String>> getProperties() {
         return this.properties;
     }
-    private void setProperties(Map<ImageDataKey, ImageDataProperty<String>> properties) {
+    private void setProperties(Map<ImageDataKey, ChangeTrackingProperty<String>> properties) {
         this.properties = properties;
     }
 

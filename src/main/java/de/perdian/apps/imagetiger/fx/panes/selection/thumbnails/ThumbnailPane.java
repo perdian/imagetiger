@@ -79,7 +79,7 @@ class ThumbnailPane extends GridPane {
         GridPane.setMargin(selectedButton, new Insets(5, 5, 5, 5));
 
         Label fileNameLabel = new Label();
-        fileNameLabel.textProperty().bind(imageFile.getFileName().getSavedValue());
+        fileNameLabel.textProperty().bind(imageFile.getFileName().getOriginalValue());
         fileNameLabel.maxWidthProperty().bind(Bindings.subtract(widthAndHeightProperty, 10));
         GridPane.setMargin(fileNameLabel, new Insets(5, 5, 5, 5));
 

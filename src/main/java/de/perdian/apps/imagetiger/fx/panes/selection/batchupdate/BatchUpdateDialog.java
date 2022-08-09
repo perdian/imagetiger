@@ -17,6 +17,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
+import javafx.geometry.Insets;
 import javafx.scene.control.Dialog;
 import javafx.stage.Window;
 
@@ -25,6 +26,7 @@ public class BatchUpdateDialog extends Dialog<Void> {
     BatchUpdateDialog(Window parentWindow, Selection selection, JobExecutor jobExecutor) {
 
         BatchUpdateDialogPane batchUpdateDialogPane = new BatchUpdateDialogPane(selection, jobExecutor);
+        batchUpdateDialogPane.setPadding(new Insets(10, 10, 10, 10));
 
         this.getDialogPane().setContent(batchUpdateDialogPane);
         this.getDialogPane().setPrefSize(1600, 1200);
