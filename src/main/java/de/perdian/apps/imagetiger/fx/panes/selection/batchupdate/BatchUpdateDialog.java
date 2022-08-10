@@ -23,7 +23,7 @@ import javafx.stage.Window;
 
 public class BatchUpdateDialog extends Dialog<Void> {
 
-    BatchUpdateDialog(Window parentWindow, Selection selection, JobExecutor jobExecutor) {
+    public BatchUpdateDialog(Window parentWindow, Selection selection, JobExecutor jobExecutor) {
 
         BatchUpdateDialogPane batchUpdateDialogPane = new BatchUpdateDialogPane(selection, jobExecutor);
         batchUpdateDialogPane.setPadding(new Insets(10, 10, 10, 10));

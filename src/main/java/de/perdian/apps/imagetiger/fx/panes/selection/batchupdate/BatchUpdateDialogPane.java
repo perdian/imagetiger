@@ -19,6 +19,8 @@ import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
@@ -32,12 +34,31 @@ class BatchUpdateDialogPane extends GridPane {
         ObservableList<BatchUpdateItem> items = FXCollections.observableArrayList();
         items.setAll(selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList());
 
+        BatchUpdateSettings settings = new BatchUpdateSettings();
+        BatchUpdateSettingsPane settingsPane = new BatchUpdateSettingsPane(settings);
+        settingsPane.setPadding(new Insets(10, 10, 10, 10));
+        TitledPane settingsTitledPane = new TitledPane("Settings", settingsPane);
+        settingsTitledPane.setFocusTraversable(false);
+        settingsTitledPane.setCollapsible(false);
+        GridPane.setHgrow(settingsTitledPane, Priority.ALWAYS);
+
+        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane();
+        actionsPane.setPadding(new Insets(10, 10, 10, 10));
+        TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
+        actionsTitledPane.setFocusTraversable(false);
+        actionsTitledPane.setCollapsible(false);
+        GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
+
         BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(items);
         GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
         GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
 
-        this.add(itemsTableView, 0, 0, 1, 1);
+        this.add(settingsTitledPane, 0, 0, 1, 1);
+        this.add(actionsTitledPane, 0, 1, 1, 1);
+        this.add(itemsTableView, 0, 2, 1, 1);
 
+        this.setHgap(10);
+        this.setVgap(10);
 
         this.setSelection(selection);
         this.setJobExecutor(jobExecutor);

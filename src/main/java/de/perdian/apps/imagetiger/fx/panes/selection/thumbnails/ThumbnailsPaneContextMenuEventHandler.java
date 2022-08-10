@@ -19,7 +19,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
 import de.perdian.apps.imagetiger.fx.model.Selection;
-import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateDialogActionEventHandler;
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateDialog;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -45,7 +45,7 @@ class ThumbnailsPaneContextMenuEventHandler implements EventHandler<ContextMenuE
     public void handle(ContextMenuEvent event) {
 
         MenuItem batchUpdateMenuItem = new MenuItem("Batch update", new FontIcon(MaterialDesignF.FOLDER_TABLE_OUTLINE));
-        batchUpdateMenuItem.setOnAction(new BatchUpdateDialogActionEventHandler(this.getParentNode(), this.getSelection(), this.getJobExecutor()));
+        batchUpdateMenuItem.setOnAction(e -> new BatchUpdateDialog(this.getParentNode().getScene().getWindow(), this.getSelection(), this.getJobExecutor()).show());
 
         Window ownerWindow = this.getParentNode().getScene().getWindow();
         ContextMenu contextMenu = new ContextMenu();
