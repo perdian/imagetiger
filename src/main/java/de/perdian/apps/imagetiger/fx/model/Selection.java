@@ -54,7 +54,7 @@ public class Selection {
     private JobExecutor jobExecutor = null;
     private ImageFileParser imageFileParser = new DefaultImageFileParser();
 
-    public Selection(BooleanProperty busyProperty, JobExecutor jobExecutor) {
+    public Selection(JobExecutor jobExecutor) {
 
         ObservableList<ImageFile> dirtyImageFiles = FXCollections.observableArrayList();
         ObservableList<ImageFile> availableImageFiles = FXCollections.observableArrayList();
@@ -73,7 +73,7 @@ public class Selection {
             }
         });
 
-        this.setBusy(busyProperty);
+        this.setBusy(jobExecutor.getBusy());
         this.setDirty(new SimpleBooleanProperty());
         this.setSelectedDirectory(new SimpleObjectProperty<>());
         this.setAvailableImageFiles(availableImageFiles);

@@ -23,10 +23,8 @@ import de.perdian.apps.imagetiger.fx.panes.directories.DirectoryPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.SelectionPane;
 import de.perdian.apps.imagetiger.fx.panes.status.StatusPane;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -35,9 +33,8 @@ class ImageTigerPane extends GridPane {
 
     ImageTigerPane(ImageTigerPreferences preferences) {
 
-        BooleanProperty busyProperty = new SimpleBooleanProperty(false);
-        JobExecutor jobExecutor = new JobExecutor(busyProperty);
-        Selection selection = new Selection(busyProperty, jobExecutor);
+        JobExecutor jobExecutor = new JobExecutor();
+        Selection selection = new Selection(jobExecutor);
 
         SelectionPane selectionPane = new SelectionPane(selection, jobExecutor, preferences);
         GridPane.setHgrow(selectionPane, Priority.ALWAYS);

@@ -15,6 +15,81 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableBooleanValue;
+
 class BatchUpdateSettings {
+
+    private StringProperty originalFileNamePattern = null;
+    private StringProperty newFileName = null;
+    private StringProperty newFileExtension = null;
+    private StringProperty newFileDateLocalString = null;
+    private StringProperty newFileDateLocalZone = null;
+    private ObservableBooleanValue ready = null;
+
+    BatchUpdateSettings() {
+
+        StringProperty originalFileNamePattern = new SimpleStringProperty();
+        StringProperty newFileName = new SimpleStringProperty();
+        StringProperty newFileExtension = new SimpleStringProperty();
+        StringProperty newFileDateLocalString = new SimpleStringProperty();
+        StringProperty newFileDateLocalZone = new SimpleStringProperty();
+
+        this.setOriginalFileNamePattern(originalFileNamePattern);
+        this.setNewFileName(newFileName);
+        this.setNewFileExtension(newFileExtension);
+        this.setNewFileDateLocalString(newFileDateLocalString);
+        this.setNewFileDateLocalZone(newFileDateLocalZone);
+
+        ObservableBooleanValue newFileNameReady = newFileName.isNotEmpty();
+        ObservableBooleanValue newFileDateReady = newFileDateLocalString.isNotEmpty();
+        ObservableBooleanValue ready = Bindings.or(newFileNameReady, newFileDateReady);
+        this.setReady(ready);
+
+    }
+
+    StringProperty getOriginalFileNamePattern() {
+        return this.originalFileNamePattern;
+    }
+    private void setOriginalFileNamePattern(StringProperty originalFileNamePattern) {
+        this.originalFileNamePattern = originalFileNamePattern;
+    }
+
+    StringProperty getNewFileName() {
+        return this.newFileName;
+    }
+    private void setNewFileName(StringProperty newFileName) {
+        this.newFileName = newFileName;
+    }
+
+    StringProperty getNewFileExtension() {
+        return this.newFileExtension;
+    }
+    private void setNewFileExtension(StringProperty newFileExtension) {
+        this.newFileExtension = newFileExtension;
+    }
+
+    StringProperty getNewFileDateLocalString() {
+        return this.newFileDateLocalString;
+    }
+    private void setNewFileDateLocalString(StringProperty newFileDateLocalString) {
+        this.newFileDateLocalString = newFileDateLocalString;
+    }
+
+    StringProperty getNewFileDateLocalZone() {
+        return this.newFileDateLocalZone;
+    }
+    private void setNewFileDateLocalZone(StringProperty newFileDateLocalZone) {
+        this.newFileDateLocalZone = newFileDateLocalZone;
+    }
+
+    ObservableBooleanValue getReady() {
+        return this.ready;
+    }
+    private void setReady(ObservableBooleanValue ready) {
+        this.ready = ready;
+    }
 
 }

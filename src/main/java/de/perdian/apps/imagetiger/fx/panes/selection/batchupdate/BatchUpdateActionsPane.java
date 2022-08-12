@@ -15,8 +15,26 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
-import javafx.scene.layout.BorderPane;
+import java.util.List;
 
-public class BatchUpdateActionsPane extends BorderPane {
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
+import javafx.beans.binding.Bindings;
+import javafx.scene.control.Button;
+import javafx.scene.layout.FlowPane;
+
+class BatchUpdateActionsPane extends FlowPane {
+
+    BatchUpdateActionsPane(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+
+        Button executeButton = new Button("Execute update", new FontIcon(MaterialDesignP.PLAY_BOX));
+        executeButton.setOnAction(new BatchUpdateExecuteActionEventHandler(items, settings, jobExecutor));
+        executeButton.disableProperty().bind(Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy()));
+
+        this.getChildren().add(executeButton);
+
+    }
 
 }

@@ -37,19 +37,22 @@ class BatchUpdateDialogPane extends GridPane {
         BatchUpdateSettings settings = new BatchUpdateSettings();
         BatchUpdateSettingsPane settingsPane = new BatchUpdateSettingsPane(settings);
         settingsPane.setPadding(new Insets(10, 10, 10, 10));
+        settingsPane.disableProperty().bind(selection.getBusy());
         TitledPane settingsTitledPane = new TitledPane("Settings", settingsPane);
         settingsTitledPane.setFocusTraversable(false);
         settingsTitledPane.setCollapsible(false);
         GridPane.setHgrow(settingsTitledPane, Priority.ALWAYS);
 
-        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane();
+        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(items, settings, jobExecutor);
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
+        actionsPane.disableProperty().bind(selection.getBusy());
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
         actionsTitledPane.setFocusTraversable(false);
         actionsTitledPane.setCollapsible(false);
         GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
 
         BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(items);
+        itemsTableView.disableProperty().bind(selection.getBusy());
         GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
         GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
 

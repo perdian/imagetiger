@@ -26,21 +26,26 @@ class BatchUpdateSettingsPane extends GridPane {
 
         Label originalFileNamePatternLabel = new Label("Original file name pattern");
         TextField originalFileNamePatternField = new TextField();
+        originalFileNamePatternField.textProperty().bindBidirectional(settings.getOriginalFileNamePattern());
 
         Label newFileNameLabel = new Label("New file name");
         TextField newFileNameField = new TextField();
+        newFileNameField.textProperty().bindBidirectional(settings.getNewFileName());
         GridPane.setHgrow(newFileNameField, Priority.ALWAYS);
 
         Label newFileExtensionLabel = new Label("New file extension");
         TextField newFileExtensionField = new TextField();
+        newFileExtensionField.textProperty().bindBidirectional(settings.getNewFileExtension());
         newFileExtensionField.setPrefWidth(150);
 
         Label newFileDateStringLabel = new Label("New file date");
         TextField newFileDateStringField = new TextField();
+        newFileDateStringField.textProperty().bindBidirectional(settings.getNewFileDateLocalString());
         GridPane.setHgrow(newFileDateStringField, Priority.ALWAYS);
 
         Label newFileDateZoneLabel = new Label("New file date timezone");
         TextField newFileDateZoneField = new TextField();
+        newFileDateZoneField.textProperty().bindBidirectional(settings.getNewFileDateLocalZone());
         newFileDateZoneField.setPrefWidth(150);
 
         this.setHgap(10);

@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class JobExecutor {
 
@@ -36,9 +37,12 @@ public class JobExecutor {
     private Executor executor = Executors.newCachedThreadPool();
     private AtomicLong jobCounter = new AtomicLong();
     private JobContextImpl currentJobContext = null;
+    private BooleanProperty busy = null;
 
-    public JobExecutor(BooleanProperty busyProperty) {
-        this.addListener(new UpdateBusyPropertyWhileJobRunningJobListener(busyProperty));
+    public JobExecutor() {
+        BooleanProperty busy = new SimpleBooleanProperty();
+        this.addListener(new UpdateBusyWhileJobRunningJobListener(busy));
+        this.setBusy(busy);
     }
 
     /**
@@ -84,33 +88,40 @@ public class JobExecutor {
         Optional.ofNullable(this.getCurrentJobContext()).ifPresent(jobContext -> jobContext.setCancelled(true));
     }
 
-    private static class UpdateBusyPropertyWhileJobRunningJobListener implements JobListener {
+    private static class UpdateBusyWhileJobRunningJobListener implements JobListener {
 
-        private Property<Boolean> busyProperty = null;
+        private Property<Boolean> busy = null;
 
-        public UpdateBusyPropertyWhileJobRunningJobListener(Property<Boolean> busyProperty) {
-            this.setBusyProperty(busyProperty);
+        private UpdateBusyWhileJobRunningJobListener(Property<Boolean> busy) {
+            this.setBusy(busy);
         }
 
         @Override
         public void jobStarted(Job job) {
-            Platform.runLater(() -> this.getBusyProperty().setValue(Boolean.TRUE));
+            Platform.runLater(() -> this.getBusy().setValue(Boolean.TRUE));
         }
 
         @Override
         public void jobCompleted(Job job, boolean otherJobsActive) {
             if (!otherJobsActive) {
-                Platform.runLater(() -> this.getBusyProperty().setValue(Boolean.FALSE));
+                Platform.runLater(() -> this.getBusy().setValue(Boolean.FALSE));
             }
         }
 
-        private Property<Boolean> getBusyProperty() {
-            return this.busyProperty;
+        private Property<Boolean> getBusy() {
+            return this.busy;
         }
-        private void setBusyProperty(Property<Boolean> busyProperty) {
-            this.busyProperty = busyProperty;
+        private void setBusy(Property<Boolean> busy) {
+            this.busy = busy;
         }
 
+    }
+
+    public BooleanProperty getBusy() {
+        return this.busy;
+    }
+    private void setBusy(BooleanProperty busy) {
+        this.busy = busy;
     }
 
     public void addListener(JobListener listener) {

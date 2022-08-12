@@ -21,9 +21,7 @@ import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -50,9 +48,8 @@ public class BatchUpdateDialogPaneLauncher {
         @Override
         public void start(Stage primaryStage) throws Exception {
 
-            BooleanProperty busyProperty = new SimpleBooleanProperty();
-            JobExecutor jobExecutor = new JobExecutor(busyProperty);
-            Selection selection = new Selection(busyProperty, jobExecutor);
+            JobExecutor jobExecutor = new JobExecutor();
+            Selection selection = new Selection(jobExecutor);
 
             ObjectProperty<File> directoryProperty = this.getPreferences().createFileProperty("selectedDirectory", new File(System.getProperty("user.home")));
             File directory = directoryProperty.getValue().exists() ? directoryProperty.getValue() : new File(System.getProperty("user.home"));
