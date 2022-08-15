@@ -45,7 +45,13 @@ class BatchUpdateItem {
         BooleanProperty dirtyProperty = new SimpleBooleanProperty(false);
         List<ChangeTrackingProperty<?>> dirtyCheckingProperties = List.of(fileName, fileNameWithoutExtension, fileExtension, fileDateLocalString, fileDateLocalZone);
         dirtyCheckingProperties.forEach(property -> property.getDirty().addListener((o, oldValue, newValue) -> {
-            dirtyProperty.setValue(dirtyCheckingProperties.stream().map(p -> p.getDirty().getValue()).findAny().orElse(false));
+            for (ChangeTrackingProperty<?> dirtyCheckingProperty : dirtyCheckingProperties) {
+                if (dirtyCheckingProperty.getDirty().get()) {
+                    dirtyProperty.setValue(true);
+                    return;
+                }
+            }
+            dirtyProperty.setValue(false);
         }));
 
         this.setFileName(fileName);

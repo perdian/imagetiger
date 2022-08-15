@@ -53,7 +53,7 @@ public class BatchUpdateDialogPaneLauncher {
 
             ObjectProperty<File> directoryProperty = this.getPreferences().createFileProperty("selectedDirectory", new File(System.getProperty("user.home")));
             File directory = directoryProperty.getValue().exists() ? directoryProperty.getValue() : new File(System.getProperty("user.home"));
-            selection.updateSelectedDirectory(directory);
+            selection.updateSelectedDirectory(directory, true);
 
             BatchUpdateDialogPane primaryPane = new BatchUpdateDialogPane(selection, jobExecutor);
             primaryPane.setPadding(new Insets(10, 10, 10, 10));

@@ -41,7 +41,7 @@ class ImageTigerPane extends GridPane {
 
         DirectoryPane directoryPane = new DirectoryPane();
         directoryPane.setMinWidth(300);
-        directoryPane.selectedDirectoryProperty().addListener((o, oldValue, newValue) -> selection.updateSelectedDirectory(newValue));
+        directoryPane.selectedDirectoryProperty().addListener((o, oldValue, newValue) -> selection.updateSelectedDirectory(newValue, false));
         GridPane.setVgrow(directoryPane, Priority.ALWAYS);
 
         StatusPane statusPane = new StatusPane(jobExecutor);

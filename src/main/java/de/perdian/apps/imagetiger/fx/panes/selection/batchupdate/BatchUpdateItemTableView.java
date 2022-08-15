@@ -21,14 +21,15 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
 import de.perdian.apps.imagetiger.fx.support.tables.TableViewHelper;
 import javafx.collections.ObservableList;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.TextFieldTableCell;
 
 class BatchUpdateItemTableView extends TableView<BatchUpdateItem> {
 
     BatchUpdateItemTableView(ObservableList<BatchUpdateItem> items) {
         super(items);
-
 
         TableColumn<BatchUpdateItem, Boolean> dirtyColumn = new TableColumn<>("");
         dirtyColumn.setCellValueFactory(callback -> callback.getValue().getDirty());
@@ -49,26 +50,30 @@ class BatchUpdateItemTableView extends TableView<BatchUpdateItem> {
         newFileExtensionColumn.setMinWidth(75);
         newFileExtensionColumn.setMaxWidth(75);
         newFileExtensionColumn.setCellValueFactory(features -> features.getValue().getFileExtension().getNewValue());
+        newFileExtensionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        newFileExtensionColumn.setEditable(true);
 
         TableColumn<BatchUpdateItem, String> originalFileDateLocalColumn = new TableColumn<>("Original file date");
         originalFileDateLocalColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getOriginalValue());
-        originalFileDateLocalColumn.setMinWidth(200);
-        originalFileDateLocalColumn.setPrefWidth(300);
-        originalFileDateLocalColumn.setMaxWidth(300);
+        originalFileDateLocalColumn.setMinWidth(150);
+        originalFileDateLocalColumn.setPrefWidth(200);
+        originalFileDateLocalColumn.setMaxWidth(200);
 
         TableColumn<BatchUpdateItem, String> newFileDateLocalStringColumn = new TableColumn<>("New file date");
         newFileDateLocalStringColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getNewValue());
-        newFileDateLocalStringColumn.setMinWidth(200);
-        newFileDateLocalStringColumn.setPrefWidth(300);
-        newFileDateLocalStringColumn.setMaxWidth(300);
+        newFileDateLocalStringColumn.setMinWidth(150);
+        newFileDateLocalStringColumn.setPrefWidth(200);
+        newFileDateLocalStringColumn.setMaxWidth(200);
 
         TableColumn<BatchUpdateItem, String> newFileDateLocalZoneColumn = new TableColumn<>("New file date zone");
         newFileDateLocalZoneColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalZone().getNewValue());
         newFileDateLocalZoneColumn.setMinWidth(150);
-        newFileDateLocalZoneColumn.setPrefWidth(200);
-        newFileDateLocalZoneColumn.setMaxWidth(200);
+        newFileDateLocalZoneColumn.setPrefWidth(150);
+        newFileDateLocalZoneColumn.setMaxWidth(150);
 
+        this.setEditable(true);
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.getColumns().add(dirtyColumn);
         this.getColumns().addAll(List.of(originalFileNameColumn, newFileNameWithoutExtensionColumn, newFileExtensionColumn));
         this.getColumns().addAll(List.of(originalFileDateLocalColumn, newFileDateLocalStringColumn, newFileDateLocalZoneColumn));

@@ -36,12 +36,21 @@ class BatchUpdateExecuteActionEventHandler implements EventHandler<ActionEvent> 
     @Override
     public void handle(ActionEvent event) {
         this.getJobExecutor().executeJob(jobContext -> {
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-                // Ignore
+            List<BatchUpdateItem> items = this.getItems();
+            for (int i=0; i < items.size() && !jobContext.isCancelled(); i++) {
+                BatchUpdateItem item = items.get(i);
+                jobContext.updateProgress("Updating file: " + item.getFileName().getOriginalValue().getValue(), i, items.size());
+                this.updateItem(item);
             }
         });
+    }
+
+    private void updateItem(BatchUpdateItem item) {
+        try {
+            Thread.sleep(500);
+        } catch (Exception e) {
+            // Ignore here
+        }
     }
 
     private List<BatchUpdateItem> getItems() {

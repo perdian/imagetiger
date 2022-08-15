@@ -15,6 +15,8 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
+import java.util.List;
+
 import de.perdian.apps.imagetiger.fx.model.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.collections.FXCollections;
@@ -31,8 +33,8 @@ class BatchUpdateDialogPane extends GridPane {
 
     BatchUpdateDialogPane(Selection selection, JobExecutor jobExecutor) {
 
-        ObservableList<BatchUpdateItem> items = FXCollections.observableArrayList();
-        items.setAll(selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList());
+        List<BatchUpdateItem> items = selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList();
+        ObservableList<BatchUpdateItem> observableItems = FXCollections.observableArrayList(items);
 
         BatchUpdateSettings settings = new BatchUpdateSettings();
         BatchUpdateSettingsPane settingsPane = new BatchUpdateSettingsPane(settings);
@@ -43,7 +45,7 @@ class BatchUpdateDialogPane extends GridPane {
         settingsTitledPane.setCollapsible(false);
         GridPane.setHgrow(settingsTitledPane, Priority.ALWAYS);
 
-        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(items, settings, jobExecutor);
+        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(observableItems, settings, jobExecutor);
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
         actionsPane.disableProperty().bind(selection.getBusy());
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
@@ -51,7 +53,7 @@ class BatchUpdateDialogPane extends GridPane {
         actionsTitledPane.setCollapsible(false);
         GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
 
-        BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(items);
+        BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(observableItems);
         itemsTableView.disableProperty().bind(selection.getBusy());
         GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
         GridPane.setVgrow(itemsTableView, Priority.ALWAYS);

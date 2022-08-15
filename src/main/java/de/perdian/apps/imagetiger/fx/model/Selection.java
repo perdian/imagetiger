@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +85,8 @@ public class Selection {
 
     }
 
-    public void updateSelectedDirectory(File newDirectory) {
-        this.getJobExecutor().executeJob(context -> {
+    public void updateSelectedDirectory(File newDirectory, boolean waitUntilCompleted) {
+        Future<?> future = this.getJobExecutor().executeJob(context -> {
             List<ImageFile> imageFiles = this.parseImageFiles(newDirectory, context);
             synchronized (this) {
                 if (!context.isCancelled()) {
@@ -97,6 +98,13 @@ public class Selection {
                 }
             }
         });
+        if (waitUntilCompleted) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                log.debug("Cannot wait for Future", e);
+            }
+        }
     }
 
     public void updatePrimaryImageFile(ImageFile newPrimaryImageFile) {

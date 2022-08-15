@@ -18,8 +18,9 @@ package de.perdian.apps.imagetiger.fx.support.jobs;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class JobExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
     private List<JobListener> listeners = new CopyOnWriteArrayList<>();
-    private Executor executor = Executors.newCachedThreadPool();
+    private ExecutorService executor = Executors.newCachedThreadPool();
     private AtomicLong jobCounter = new AtomicLong();
     private JobContextImpl currentJobContext = null;
     private BooleanProperty busy = null;
@@ -53,7 +54,7 @@ public class JobExecutor {
      * @param job
      *     the job to be executed
      */
-    public synchronized void executeJob(Job job) {
+    public synchronized Future<?> executeJob(Job job) {
 
         // If we already have a job running, we need to make sure that it gets
         // cancelled first
@@ -63,7 +64,7 @@ public class JobExecutor {
         this.setCurrentJobContext(jobContext);
 
         log.trace("Executing job: {}", job);
-        this.getExecutor().execute(() -> {
+        return this.getExecutor().submit(() -> {
 
             this.getListeners().forEach(listener -> listener.jobStarted(job));
             try {
@@ -134,10 +135,10 @@ public class JobExecutor {
         this.listeners = listeners;
     }
 
-    Executor getExecutor() {
+    ExecutorService getExecutor() {
         return this.executor;
     }
-    void setExecutor(Executor executor) {
+    void setExecutor(ExecutorService executor) {
         this.executor = executor;
     }
 
