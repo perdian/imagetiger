@@ -45,6 +45,8 @@ class BatchUpdateItemTableView extends TableView<BatchUpdateItem> {
 
         TableColumn<BatchUpdateItem, String> newFileNameWithoutExtensionColumn = new TableColumn<>("New file name");
         newFileNameWithoutExtensionColumn.setCellValueFactory(features -> features.getValue().getFileNameWithoutExtension().getNewValue());
+        newFileNameWithoutExtensionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        newFileNameWithoutExtensionColumn.setEditable(true);
 
         TableColumn<BatchUpdateItem, String> newFileExtensionColumn = new TableColumn<>("Ext");
         newFileExtensionColumn.setMinWidth(75);
@@ -54,22 +56,26 @@ class BatchUpdateItemTableView extends TableView<BatchUpdateItem> {
         newFileExtensionColumn.setEditable(true);
 
         TableColumn<BatchUpdateItem, String> originalFileDateLocalColumn = new TableColumn<>("Original file date");
-        originalFileDateLocalColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getOriginalValue());
         originalFileDateLocalColumn.setMinWidth(150);
         originalFileDateLocalColumn.setPrefWidth(200);
         originalFileDateLocalColumn.setMaxWidth(200);
+        originalFileDateLocalColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getOriginalValue());
 
         TableColumn<BatchUpdateItem, String> newFileDateLocalStringColumn = new TableColumn<>("New file date");
-        newFileDateLocalStringColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getNewValue());
         newFileDateLocalStringColumn.setMinWidth(150);
         newFileDateLocalStringColumn.setPrefWidth(200);
         newFileDateLocalStringColumn.setMaxWidth(200);
+        newFileDateLocalStringColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalString().getNewValue());
+        newFileDateLocalStringColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        newFileDateLocalStringColumn.setEditable(true);
 
         TableColumn<BatchUpdateItem, String> newFileDateLocalZoneColumn = new TableColumn<>("New file date zone");
-        newFileDateLocalZoneColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalZone().getNewValue());
         newFileDateLocalZoneColumn.setMinWidth(150);
         newFileDateLocalZoneColumn.setPrefWidth(150);
         newFileDateLocalZoneColumn.setMaxWidth(150);
+        newFileDateLocalZoneColumn.setCellValueFactory(features -> features.getValue().getFileDateLocalZone().getNewValue());
+        newFileDateLocalZoneColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        newFileDateLocalZoneColumn.setEditable(true);
 
         this.setEditable(true);
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

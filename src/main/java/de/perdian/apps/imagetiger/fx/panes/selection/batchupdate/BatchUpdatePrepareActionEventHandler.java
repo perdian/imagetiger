@@ -17,17 +17,23 @@ package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-class BatchUpdateExecuteActionEventHandler implements EventHandler<ActionEvent> {
+class BatchUpdatePrepareActionEventHandler implements EventHandler<ActionEvent> {
+
+    private static final Logger log = LoggerFactory.getLogger(BatchUpdatePrepareActionEventHandler.class);
 
     private List<BatchUpdateItem> items = null;
     private BatchUpdateSettings settings = null;
     private JobExecutor jobExecutor = null;
 
-    BatchUpdateExecuteActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+    BatchUpdatePrepareActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
         this.setItems(items);
         this.setSettings(settings);
         this.setJobExecutor(jobExecutor);
@@ -35,22 +41,36 @@ class BatchUpdateExecuteActionEventHandler implements EventHandler<ActionEvent> 
 
     @Override
     public void handle(ActionEvent event) {
+        log.debug("Preparing property evaluation from settings: {}", this.getSettings());
         this.getJobExecutor().executeJob(jobContext -> {
             List<BatchUpdateItem> items = this.getItems();
+            BatchUpdatePrepareOperationContext operationContext = new BatchUpdatePrepareOperationContext(this.getSettings());
             for (int i=0; i < items.size() && !jobContext.isCancelled(); i++) {
+
                 BatchUpdateItem item = items.get(i);
                 jobContext.updateProgress("Updating file: " + item.getFileName().getOriginalValue().getValue(), i, items.size());
-                this.updateItem(item);
+
+                BatchUpdatePrepareItemContext batchUpdatePrepareItemContext = operationContext.createItemContext(item);
+                String newFileName = this.getSettings().getNewFileName().getValue();
+                String newFileExtension = this.getSettings().getNewFileExtension().getValue();
+                if (StringUtils.isNotEmpty(newFileName)) {
+                    item.getFileNameWithoutExtension().getNewValue().setValue(batchUpdatePrepareItemContext.evaluate(newFileName));
+                }
+                if (StringUtils.isNotEmpty(newFileExtension)) {
+                    item.getFileExtension().getNewValue().setValue(batchUpdatePrepareItemContext.evaluate(newFileExtension));
+                }
+
+                String newFileDateLocalString = this.getSettings().getNewFileDateLocalString().getValue();
+                String newFileDateLocalZone = this.getSettings().getNewFileDateLocalZone().getValue();
+                if (StringUtils.isNotEmpty(newFileDateLocalString)) {
+                    item.getFileDateLocalString().getNewValue().setValue(batchUpdatePrepareItemContext.evaluate(newFileDateLocalString));
+                }
+                if (StringUtils.isNotEmpty(newFileDateLocalZone)) {
+                    item.getFileDateLocalZone().getNewValue().setValue(batchUpdatePrepareItemContext.evaluate(newFileDateLocalZone));
+                }
+
             }
         });
-    }
-
-    private void updateItem(BatchUpdateItem item) {
-        try {
-            Thread.sleep(500);
-        } catch (Exception e) {
-            // Ignore here
-        }
     }
 
     private List<BatchUpdateItem> getItems() {

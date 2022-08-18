@@ -15,25 +15,29 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
-import java.util.List;
-
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
 
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 
 class BatchUpdateActionsPane extends FlowPane {
 
-    BatchUpdateActionsPane(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+    BatchUpdateActionsPane(ObservableList<BatchUpdateItem> allItems, ObservableList<BatchUpdateItem> selectedItems, BatchUpdateSettings settings, JobExecutor jobExecutor) {
 
-        Button executeButton = new Button("Execute update", new FontIcon(MaterialDesignP.PLAY_BOX));
-        executeButton.setOnAction(new BatchUpdateExecuteActionEventHandler(items, settings, jobExecutor));
-        executeButton.disableProperty().bind(Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy()));
+        Button prepareButton = new Button("Update properties", new FontIcon(MaterialDesignU.UPDATE));
+        prepareButton.setOnAction(new BatchUpdatePrepareActionEventHandler(selectedItems, settings, jobExecutor));
+        prepareButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(selectedItems), Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy())));
 
-        this.getChildren().add(executeButton);
+        Button executeButton = new Button("Execute update", new FontIcon(MaterialDesignP.PLAY));
+        executeButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(allItems), jobExecutor.getBusy()));
+
+        this.setHgap(5);
+        this.getChildren().addAll(prepareButton, executeButton);
 
     }
 

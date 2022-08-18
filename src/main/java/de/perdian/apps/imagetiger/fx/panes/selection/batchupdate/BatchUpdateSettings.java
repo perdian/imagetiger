@@ -15,9 +15,16 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 
 class BatchUpdateSettings {
@@ -28,26 +35,54 @@ class BatchUpdateSettings {
     private StringProperty newFileDateLocalString = null;
     private StringProperty newFileDateLocalZone = null;
     private ObservableBooleanValue ready = null;
+    private List<ChangeListener<String>> changeListeners = null;
 
     BatchUpdateSettings() {
 
-        StringProperty originalFileNamePattern = new SimpleStringProperty();
-        StringProperty newFileName = new SimpleStringProperty();
-        StringProperty newFileExtension = new SimpleStringProperty();
-        StringProperty newFileDateLocalString = new SimpleStringProperty();
-        StringProperty newFileDateLocalZone = new SimpleStringProperty();
+        List<ChangeListener<String>> changeListeners = new CopyOnWriteArrayList<>();
+        ChangeListener<String> changeListener = (o, oldValue, newValue) -> {
+            for (ChangeListener<String> changeListenerDelegee : changeListeners) {
+                changeListenerDelegee.changed(o, oldValue, newValue);
+            }
+        };
+        this.setChangeListeners(changeListeners);
 
+        StringProperty originalFileNamePattern = new SimpleStringProperty();
+        originalFileNamePattern.addListener(changeListener);
         this.setOriginalFileNamePattern(originalFileNamePattern);
+
+        StringProperty newFileName = new SimpleStringProperty();
+        newFileName.addListener(changeListener);
         this.setNewFileName(newFileName);
+
+        StringProperty newFileExtension = new SimpleStringProperty();
+        newFileExtension.addListener(changeListener);
         this.setNewFileExtension(newFileExtension);
+
+        StringProperty newFileDateLocalString = new SimpleStringProperty();
+        newFileDateLocalString.addListener(changeListener);
         this.setNewFileDateLocalString(newFileDateLocalString);
+
+        StringProperty newFileDateLocalZone = new SimpleStringProperty();
+        newFileDateLocalZone.addListener(changeListener);
         this.setNewFileDateLocalZone(newFileDateLocalZone);
 
-        ObservableBooleanValue newFileNameReady = newFileName.isNotEmpty();
+        ObservableBooleanValue newFileNameReady = Bindings.or(newFileName.isNotEmpty(), newFileExtension.isNotEmpty());
         ObservableBooleanValue newFileDateReady = newFileDateLocalString.isNotEmpty();
         ObservableBooleanValue ready = Bindings.or(newFileNameReady, newFileDateReady);
         this.setReady(ready);
 
+    }
+
+    @Override
+    public String toString() {
+        ToStringBuilder toStringBuilder = new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE);
+        toStringBuilder.append("originalFileNamePattern", this.getOriginalFileNamePattern().getValue());
+        toStringBuilder.append("newFileName", this.getNewFileName().getValue());
+        toStringBuilder.append("newFileExtension", this.getNewFileExtension().getValue());
+        toStringBuilder.append("newFileDateLocalString", this.getNewFileDateLocalString().getValue());
+        toStringBuilder.append("newFileDateLocalZone", this.getNewFileDateLocalZone().getValue());
+        return toStringBuilder.toString();
     }
 
     StringProperty getOriginalFileNamePattern() {
@@ -90,6 +125,16 @@ class BatchUpdateSettings {
     }
     private void setReady(ObservableBooleanValue ready) {
         this.ready = ready;
+    }
+
+    public void addChangeListener(ChangeListener<String> changeListener) {
+        this.getChangeListeners().add(changeListener);
+    }
+    private List<ChangeListener<String>> getChangeListeners() {
+        return this.changeListeners;
+    }
+    private void setChangeListeners(List<ChangeListener<String>> changeListeners) {
+        this.changeListeners = changeListeners;
     }
 
 }

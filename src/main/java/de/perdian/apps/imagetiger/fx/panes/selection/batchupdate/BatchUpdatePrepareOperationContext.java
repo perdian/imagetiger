@@ -15,6 +15,23 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
-public class BatchUpdateExecuteContext {
+class BatchUpdatePrepareOperationContext {
+
+    private BatchUpdateSettings settings = null;
+
+    BatchUpdatePrepareOperationContext(BatchUpdateSettings settings) {
+        this.setSettings(settings);
+    }
+
+    BatchUpdatePrepareItemContext createItemContext(BatchUpdateItem item) {
+        return new BatchUpdatePrepareItemContext(this, item);
+    }
+
+    private BatchUpdateSettings getSettings() {
+        return this.settings;
+    }
+    private void setSettings(BatchUpdateSettings settings) {
+        this.settings = settings;
+    }
 
 }

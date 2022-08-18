@@ -37,6 +37,7 @@ class BatchUpdateDialogPane extends GridPane {
         ObservableList<BatchUpdateItem> observableItems = FXCollections.observableArrayList(items);
 
         BatchUpdateSettings settings = new BatchUpdateSettings();
+
         BatchUpdateSettingsPane settingsPane = new BatchUpdateSettingsPane(settings);
         settingsPane.setPadding(new Insets(10, 10, 10, 10));
         settingsPane.disableProperty().bind(selection.getBusy());
@@ -45,18 +46,19 @@ class BatchUpdateDialogPane extends GridPane {
         settingsTitledPane.setCollapsible(false);
         GridPane.setHgrow(settingsTitledPane, Priority.ALWAYS);
 
-        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(observableItems, settings, jobExecutor);
+        BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(observableItems);
+        itemsTableView.disableProperty().bind(selection.getBusy());
+        itemsTableView.getSelectionModel().selectAll();
+        GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
+        GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
+
+        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(observableItems, itemsTableView.getSelectionModel().getSelectedItems(), settings, jobExecutor);
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
         actionsPane.disableProperty().bind(selection.getBusy());
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
         actionsTitledPane.setFocusTraversable(false);
         actionsTitledPane.setCollapsible(false);
         GridPane.setHgrow(actionsTitledPane, Priority.ALWAYS);
-
-        BatchUpdateItemTableView itemsTableView = new BatchUpdateItemTableView(observableItems);
-        itemsTableView.disableProperty().bind(selection.getBusy());
-        GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
-        GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
 
         this.add(settingsTitledPane, 0, 0, 1, 1);
         this.add(actionsTitledPane, 0, 1, 1, 1);
