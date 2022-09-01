@@ -46,7 +46,7 @@ public class BatchUpdateJobTest {
 
             BatchUpdateSettings updateSettings = new BatchUpdateSettings();
             updateSettings.getOriginalFileNamePattern().setValue("IMG_(?<plainName>.*)");
-            updateSettings.getNewFileName().setValue("#{counter} #{file.group('plainName')}");
+            updateSettings.getNewFileName().setValue("#{counter} #{file.name}");
             updateSettings.getNewFileExtension().setValue("#{lowercase(file.extension)}");
 
             List<BatchUpdateItem> updateItems = imageFiles.stream().map(BatchUpdateItem::new).toList();
@@ -66,9 +66,10 @@ public class BatchUpdateJobTest {
                 int fileNameLength = Math.max(oldFileName.length(), newFileName.length());
 
                 System.err.append("\n[").append(String.valueOf(i+1)).append("/").append(String.valueOf(updateItems.size())).append("] ");
-                System.err.append(StringUtils.rightPad(oldFileName, fileNameLength));
+                System.err.append("   ").append(StringUtils.rightPad(oldFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getOriginalValue().getValue());
-                System.err.append("\n   -> ").append(StringUtils.rightPad(newFileName, fileNameLength));
+                System.err.append("\n[").append(String.valueOf(i+1)).append("/").append(String.valueOf(updateItems.size())).append("] ");
+                System.err.append("-> ").append(StringUtils.rightPad(newFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getNewValue().getValue());
                 System.err.append("\n").flush();
 
