@@ -15,6 +15,13 @@
  */
 package de.perdian.apps.imagetiger.fx.model.batchupdate;
 
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 class BatchUpdateItemContext {
 
     private BatchUpdateContext updateContext = null;
@@ -25,8 +32,13 @@ class BatchUpdateItemContext {
         this.setItem(item);
     }
 
-    String evaluate(String expression) {
-        return "foo";
+    String evaluate(String expressionValue) {
+        BatchUpdateExpressionRoot expressionRoot = new BatchUpdateExpressionRoot(this.getItem(), this.getUpdateContext());
+        EvaluationContext evaluationContext = new StandardEvaluationContext(expressionRoot);
+        TemplateParserContext templateParserContext = new TemplateParserContext("#{", "}");
+        ExpressionParser expressionParser = new SpelExpressionParser();
+        Expression expression = expressionParser.parseExpression(expressionValue, templateParserContext);
+        return expression.getValue(evaluationContext, String.class);
     }
 
     private BatchUpdateContext getUpdateContext() {

@@ -34,12 +34,11 @@ public class BatchUpdateJob implements Job {
 
     @Override
     public void execute(JobContext jobContext) {
-        List<BatchUpdateItem> items = this.getItems();
-        BatchUpdateContext updateContext = new BatchUpdateContext(this.getSettings());
-        for (int i=0; i < items.size() && !jobContext.isCancelled(); i++) {
+        BatchUpdateContext updateContext = new BatchUpdateContext(this.getItems(), this.getSettings());
+        for (int i=0; i < this.getItems().size() && !jobContext.isCancelled(); i++) {
 
-            BatchUpdateItem item = items.get(i);
-            jobContext.updateProgress("Updating file: " + item.getFileName().getOriginalValue().getValue(), i, items.size());
+            BatchUpdateItem item = this.getItems().get(i);
+            jobContext.updateProgress("Updating file: " + item.getFileName().getOriginalValue().getValue(), i, this.getItems().size());
 
             BatchUpdateItemContext itemContext = updateContext.createItemContext(item);
             String newFileName = this.getSettings().getNewFileName().getValue();

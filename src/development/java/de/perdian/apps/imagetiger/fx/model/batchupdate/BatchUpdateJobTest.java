@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +45,9 @@ public class BatchUpdateJobTest {
             log.info("Processing {} image files", imageFiles.size());
 
             BatchUpdateSettings updateSettings = new BatchUpdateSettings();
-            updateSettings.getNewFileName().setValue("#{counter} #{file.name}");
-            updateSettings.getNewFileExtension().setValue("#{file.extension.toLowerCase()}");
+            updateSettings.getOriginalFileNamePattern().setValue("IMG_(?<plainName>.*)");
+            updateSettings.getNewFileName().setValue("#{counter} #{file.group('plainName')}");
+            updateSettings.getNewFileExtension().setValue("#{lowercase(file.extension)}");
 
             List<BatchUpdateItem> updateItems = imageFiles.stream().map(BatchUpdateItem::new).toList();
             BatchUpdateJob updateJob = new BatchUpdateJob(updateItems, updateSettings);
@@ -59,18 +61,20 @@ public class BatchUpdateJobTest {
             for (int i=0; i < updateItems.size(); i++) {
                 BatchUpdateItem updateItem = updateItems.get(i);
 
-                updateItem.getFileNameWithoutExtension().getOriginalValue().getValue();
+                String oldFileName = updateItem.getFileName().getOriginalValue().getValue();
+                String newFileName = updateItem.getFileNameWithoutExtension().getNewValue().getValue() + "." + updateItem.getFileExtension().getNewValue().getValue();
+                int fileNameLength = Math.max(oldFileName.length(), newFileName.length());
+
                 System.err.append("\n[").append(String.valueOf(i+1)).append("/").append(String.valueOf(updateItems.size())).append("] ");
-                System.err.append(updateItem.getFileName().getOriginalValue().getValue());
+                System.err.append(StringUtils.rightPad(oldFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getOriginalValue().getValue());
-                System.err.append("\n   -> ").append(updateItem.getFileNameWithoutExtension().getNewValue().getValue());
-                System.err.append(".").append(updateItem.getFileExtension().getNewValue().getValue());
+                System.err.append("\n   -> ").append(StringUtils.rightPad(newFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getNewValue().getValue());
                 System.err.append("\n").flush();
 
             }
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             log.error("Cannot execute batch update", e);
         } finally {
             System.exit(0);

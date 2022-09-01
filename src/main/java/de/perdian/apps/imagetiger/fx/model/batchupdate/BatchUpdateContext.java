@@ -15,23 +15,48 @@
  */
 package de.perdian.apps.imagetiger.fx.model.batchupdate;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
 class BatchUpdateContext {
 
-    private BatchUpdateSettings settings = null;
+    private List<BatchUpdateItem> items = null;
+    private Map<String, Object> objects = null;
+    private Pattern originalFileNamePattern = null;
 
-    BatchUpdateContext(BatchUpdateSettings settings) {
-        this.setSettings(settings);
+    BatchUpdateContext(List<BatchUpdateItem> items, BatchUpdateSettings settings) {
+        this.setItems(items);
+        this.setObjects(new HashMap<>());
+        this.setOriginalFileNamePattern(StringUtils.isEmpty(settings.getOriginalFileNamePattern().getValue()) ? null : Pattern.compile(settings.getOriginalFileNamePattern().getValue()));
     }
 
     BatchUpdateItemContext createItemContext(BatchUpdateItem item) {
         return new BatchUpdateItemContext(this, item);
     }
 
-    private BatchUpdateSettings getSettings() {
-        return this.settings;
+    List<BatchUpdateItem> getItems() {
+        return this.items;
     }
-    private void setSettings(BatchUpdateSettings settings) {
-        this.settings = settings;
+    private void setItems(List<BatchUpdateItem> items) {
+        this.items = items;
+    }
+
+    Map<String, Object> getObjects() {
+        return this.objects;
+    }
+    private void setObjects(Map<String, Object> objects) {
+        this.objects = objects;
+    }
+
+    Pattern getOriginalFileNamePattern() {
+        return this.originalFileNamePattern;
+    }
+    private void setOriginalFileNamePattern(Pattern originalFileNamePattern) {
+        this.originalFileNamePattern = originalFileNamePattern;
     }
 
 }

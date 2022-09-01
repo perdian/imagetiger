@@ -30,9 +30,6 @@ import javafx.scene.layout.Priority;
 
 class BatchUpdateDialogPane extends GridPane {
 
-    private Selection selection = null;
-    private JobExecutor jobExecutor = null;
-
     BatchUpdateDialogPane(Selection selection, JobExecutor jobExecutor) {
 
         List<BatchUpdateItem> items = selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList();
@@ -69,22 +66,6 @@ class BatchUpdateDialogPane extends GridPane {
         this.setHgap(10);
         this.setVgap(10);
 
-        this.setSelection(selection);
-        this.setJobExecutor(jobExecutor);
-    }
-
-    private Selection getSelection() {
-        return this.selection;
-    }
-    private void setSelection(Selection selection) {
-        this.selection = selection;
-    }
-
-    private JobExecutor getJobExecutor() {
-        return this.jobExecutor;
-    }
-    private void setJobExecutor(JobExecutor jobExecutor) {
-        this.jobExecutor = jobExecutor;
     }
 
 }
