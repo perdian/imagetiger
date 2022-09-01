@@ -23,12 +23,12 @@ import java.util.stream.IntStream;
 
 import de.perdian.apps.imagetiger.fx.model.batchupdate.expression.ExpressionFile;
 
-public class BatchUpdateExpressionRoot {
+public class BatchUpdateItemExpressionRoot {
 
     private BatchUpdateContext updateContext = null;
     private ExpressionFile file = null;
 
-    BatchUpdateExpressionRoot(BatchUpdateItem item, BatchUpdateContext updateContext) {
+    BatchUpdateItemExpressionRoot(BatchUpdateItem item, BatchUpdateContext updateContext) {
         this.setUpdateContext(updateContext);
         this.setFile(new ExpressionFile(item, updateContext.getOriginalFileNamePattern()));
     }
@@ -41,7 +41,7 @@ public class BatchUpdateExpressionRoot {
         AtomicInteger counter = (AtomicInteger)this.getUpdateContext().getObjects().computeIfAbsent("counter." + counterName, key -> new AtomicInteger());
         int counterValue = counter.incrementAndGet();
         int maxCounterCharacters = String.valueOf(this.getUpdateContext().getItems().size()).length();
-        String counterFormatString = IntStream.of(maxCounterCharacters).mapToObj(i -> "0").collect(Collectors.joining());
+        String counterFormatString = IntStream.range(0, maxCounterCharacters).mapToObj(i -> "0").collect(Collectors.joining());
         NumberFormat counterFormat = new DecimalFormat(counterFormatString);
         return counterFormat.format(counterValue);
     }

@@ -33,7 +33,7 @@ class BatchUpdateItemContext {
     }
 
     String evaluate(String expressionValue) {
-        BatchUpdateExpressionRoot expressionRoot = new BatchUpdateExpressionRoot(this.getItem(), this.getUpdateContext());
+        BatchUpdateItemExpressionRoot expressionRoot = new BatchUpdateItemExpressionRoot(this.getItem(), this.getUpdateContext());
         EvaluationContext evaluationContext = new StandardEvaluationContext(expressionRoot);
         TemplateParserContext templateParserContext = new TemplateParserContext("#{", "}");
         ExpressionParser expressionParser = new SpelExpressionParser();
