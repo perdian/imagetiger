@@ -15,7 +15,7 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.list;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import javafx.scene.layout.BorderPane;
 
 public class ListPane extends BorderPane {

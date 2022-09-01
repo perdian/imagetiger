@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.tables.TableViewHelper;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.binding.Bindings;

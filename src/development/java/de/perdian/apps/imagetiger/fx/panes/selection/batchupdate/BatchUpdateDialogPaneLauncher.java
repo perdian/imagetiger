@@ -18,7 +18,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 import java.io.File;
 
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;

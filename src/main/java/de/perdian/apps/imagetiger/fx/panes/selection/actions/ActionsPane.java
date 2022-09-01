@@ -18,7 +18,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.actions;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;

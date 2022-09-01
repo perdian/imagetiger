@@ -15,7 +15,7 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.data;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.model.ImageDataKey;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;

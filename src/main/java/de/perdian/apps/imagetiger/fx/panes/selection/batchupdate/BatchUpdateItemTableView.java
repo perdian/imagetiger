@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
+import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
 import de.perdian.apps.imagetiger.fx.support.tables.TableViewHelper;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;

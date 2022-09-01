@@ -22,7 +22,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import javafx.application.Platform;

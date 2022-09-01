@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
+package de.perdian.apps.imagetiger.fx.model.batchupdate;
 
-class BatchUpdatePrepareOperationContext {
+class BatchUpdateContext {
 
     private BatchUpdateSettings settings = null;
 
-    BatchUpdatePrepareOperationContext(BatchUpdateSettings settings) {
+    BatchUpdateContext(BatchUpdateSettings settings) {
         this.setSettings(settings);
     }
 
-    BatchUpdatePrepareItemContext createItemContext(BatchUpdateItem item) {
-        return new BatchUpdatePrepareItemContext(this, item);
+    BatchUpdateItemContext createItemContext(BatchUpdateItem item) {
+        return new BatchUpdateItemContext(this, item);
     }
 
     private BatchUpdateSettings getSettings() {

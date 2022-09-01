@@ -15,7 +15,7 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.geometry.Insets;
 import javafx.scene.control.Dialog;

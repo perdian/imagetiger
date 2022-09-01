@@ -16,7 +16,7 @@
 package de.perdian.apps.imagetiger.fx.panes.selection;
 
 import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.panes.selection.actions.ActionsPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.data.DataPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.list.ListPane;

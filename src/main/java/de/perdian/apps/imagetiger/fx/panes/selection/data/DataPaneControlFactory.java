@@ -18,7 +18,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.data;
 import java.util.Objects;
 import java.util.function.Function;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
 import javafx.beans.property.Property;

@@ -15,6 +15,7 @@
  */
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
+import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateSettings;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;

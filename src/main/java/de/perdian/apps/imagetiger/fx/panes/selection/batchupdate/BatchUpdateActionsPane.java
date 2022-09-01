@@ -16,9 +16,11 @@
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignP;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
 
+import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
+import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateSettings;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -29,11 +31,11 @@ class BatchUpdateActionsPane extends FlowPane {
 
     BatchUpdateActionsPane(ObservableList<BatchUpdateItem> allItems, ObservableList<BatchUpdateItem> selectedItems, BatchUpdateSettings settings, JobExecutor jobExecutor) {
 
-        Button prepareButton = new Button("Update properties", new FontIcon(MaterialDesignU.UPDATE));
-        prepareButton.setOnAction(new BatchUpdatePrepareActionEventHandler(selectedItems, settings, jobExecutor));
+        Button prepareButton = new Button("Update file properties", new FontIcon(MaterialDesignU.UPDATE));
+        prepareButton.setOnAction(new BatchUpdateExecuteActionEventHandler(selectedItems, settings, jobExecutor));
         prepareButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(selectedItems), Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy())));
 
-        Button executeButton = new Button("Execute update", new FontIcon(MaterialDesignP.PLAY));
+        Button executeButton = new Button("Save changed files", new FontIcon(MaterialDesignC.CONTENT_SAVE));
         executeButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(allItems), jobExecutor.getBusy()));
 
         this.setHgap(5);

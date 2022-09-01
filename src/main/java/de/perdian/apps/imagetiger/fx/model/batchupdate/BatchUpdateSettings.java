@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
+package de.perdian.apps.imagetiger.fx.model.batchupdate;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,7 +27,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 
-class BatchUpdateSettings {
+public class BatchUpdateSettings {
 
     private StringProperty originalFileNamePattern = null;
     private StringProperty newFileName = null;
@@ -37,7 +37,7 @@ class BatchUpdateSettings {
     private ObservableBooleanValue ready = null;
     private List<ChangeListener<String>> changeListeners = null;
 
-    BatchUpdateSettings() {
+    public BatchUpdateSettings() {
 
         List<ChangeListener<String>> changeListeners = new CopyOnWriteArrayList<>();
         ChangeListener<String> changeListener = (o, oldValue, newValue) -> {
@@ -85,42 +85,42 @@ class BatchUpdateSettings {
         return toStringBuilder.toString();
     }
 
-    StringProperty getOriginalFileNamePattern() {
+    public StringProperty getOriginalFileNamePattern() {
         return this.originalFileNamePattern;
     }
     private void setOriginalFileNamePattern(StringProperty originalFileNamePattern) {
         this.originalFileNamePattern = originalFileNamePattern;
     }
 
-    StringProperty getNewFileName() {
+    public StringProperty getNewFileName() {
         return this.newFileName;
     }
     private void setNewFileName(StringProperty newFileName) {
         this.newFileName = newFileName;
     }
 
-    StringProperty getNewFileExtension() {
+    public StringProperty getNewFileExtension() {
         return this.newFileExtension;
     }
     private void setNewFileExtension(StringProperty newFileExtension) {
         this.newFileExtension = newFileExtension;
     }
 
-    StringProperty getNewFileDateLocalString() {
+    public StringProperty getNewFileDateLocalString() {
         return this.newFileDateLocalString;
     }
     private void setNewFileDateLocalString(StringProperty newFileDateLocalString) {
         this.newFileDateLocalString = newFileDateLocalString;
     }
 
-    StringProperty getNewFileDateLocalZone() {
+    public StringProperty getNewFileDateLocalZone() {
         return this.newFileDateLocalZone;
     }
     private void setNewFileDateLocalZone(StringProperty newFileDateLocalZone) {
         this.newFileDateLocalZone = newFileDateLocalZone;
     }
 
-    ObservableBooleanValue getReady() {
+    public ObservableBooleanValue getReady() {
         return this.ready;
     }
     private void setReady(ObservableBooleanValue ready) {

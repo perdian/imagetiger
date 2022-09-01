@@ -18,7 +18,7 @@ package de.perdian.apps.imagetiger.fx;
 import java.io.File;
 import java.util.Objects;
 
-import de.perdian.apps.imagetiger.fx.model.Selection;
+import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.panes.directories.DirectoryPane;
 import de.perdian.apps.imagetiger.fx.panes.selection.SelectionPane;
 import de.perdian.apps.imagetiger.fx.panes.status.StatusPane;
