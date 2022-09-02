@@ -53,10 +53,16 @@ public class BatchUpdateJob implements Job {
             String newFileDateLocalString = this.getSettings().getNewFileDateLocalString().getValue();
             String newFileDateLocalZone = this.getSettings().getNewFileDateLocalZone().getValue();
             if (StringUtils.isNotEmpty(newFileDateLocalString)) {
-                item.getFileDateLocalString().getNewValue().setValue(itemContext.evaluate(newFileDateLocalString));
+                String newFileDateLocalStringValue = itemContext.evaluate(newFileDateLocalString);
+                if (StringUtils.isNotEmpty(newFileDateLocalStringValue)) {
+                    item.getFileDateLocalString().getNewValue().setValue(newFileDateLocalStringValue);
+                }
             }
             if (StringUtils.isNotEmpty(newFileDateLocalZone)) {
-                item.getFileDateLocalZone().getNewValue().setValue(itemContext.evaluate(newFileDateLocalZone));
+                String newFileDateLocalZoneValue = itemContext.evaluate(newFileDateLocalZone);
+                if (StringUtils.isNotEmpty(newFileDateLocalZoneValue)) {
+                    item.getFileDateLocalZone().getNewValue().setValue(newFileDateLocalZoneValue);
+                }
             }
 
         }

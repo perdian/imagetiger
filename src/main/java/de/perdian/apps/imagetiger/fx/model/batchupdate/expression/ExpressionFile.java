@@ -15,8 +15,12 @@
  */
 package de.perdian.apps.imagetiger.fx.model.batchupdate.expression;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
 
@@ -26,10 +30,16 @@ public class ExpressionFile {
     private String extension = null;
     private Matcher originalFileNameMatcher = null;
     private boolean originalFileNameMatcherActive = false;
+    private Map<String, String> properties = null;
 
     public ExpressionFile(BatchUpdateItem item, Pattern originalFileNamePattern) {
         this.setName(item.getFileNameWithoutExtension().getOriginalValue().getValue());
         this.setExtension(item.getFileExtension().getOriginalValue().getValue());
+        this.setProperties(
+            item.getImageFile().getProperties().entrySet().stream()
+                .filter(entry -> StringUtils.isNotEmpty(entry.getValue().getOriginalValue().getValue()))
+                .collect(Collectors.toMap(entry -> entry.getKey().toString().toLowerCase(), entry -> entry.getValue().getOriginalValue().getValue()))
+        );
 
         if (originalFileNamePattern != null) {
             Matcher originalFileNameMatcher = originalFileNamePattern.matcher(item.getFileNameWithoutExtension().getOriginalValue().getValue());
@@ -80,6 +90,13 @@ public class ExpressionFile {
     }
     private void setOriginalFileNameMatcherActive(boolean originalFileNameMatcherActive) {
         this.originalFileNameMatcherActive = originalFileNameMatcherActive;
+    }
+
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
+    private void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
 }

@@ -19,15 +19,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.perdian.apps.imagetiger.fx.support.jobs.JobContext;
+import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageFileParser;
 import de.perdian.apps.imagetiger.model.impl.DefaultImageFileParser;
+import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
 import javafx.application.Platform;
 
 public class BatchUpdateJobTest {
@@ -48,6 +51,8 @@ public class BatchUpdateJobTest {
             updateSettings.getOriginalFileNamePattern().setValue("IMG_(?<plainName>.*)");
             updateSettings.getNewFileName().setValue("#{counter} #{file.name}");
             updateSettings.getNewFileExtension().setValue("#{lowercase(file.extension)}");
+            updateSettings.getNewFileDateLocalString().setValue("#{file.properties['datetime']}");
+            updateSettings.getNewFileDateLocalZone().setValue("#{file.properties['datetime_zone']}");
 
             List<BatchUpdateItem> updateItems = imageFiles.stream().map(BatchUpdateItem::new).toList();
             BatchUpdateJob updateJob = new BatchUpdateJob(updateItems, updateSettings);
@@ -68,10 +73,18 @@ public class BatchUpdateJobTest {
                 System.err.append("\n[").append(String.valueOf(i+1)).append("/").append(String.valueOf(updateItems.size())).append("] ");
                 System.err.append("   ").append(StringUtils.rightPad(oldFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getOriginalValue().getValue());
+                System.err.append(" [").append(updateItem.getFileDateLocalZone().getOriginalValue().getValue()).append("]");
                 System.err.append("\n[").append(String.valueOf(i+1)).append("/").append(String.valueOf(updateItems.size())).append("] ");
                 System.err.append("-> ").append(StringUtils.rightPad(newFileName, fileNameLength));
                 System.err.append("  @  ").append(updateItem.getFileDateLocalString().getNewValue().getValue());
-                System.err.append("\n").flush();
+                System.err.append(" [").append(updateItem.getFileDateLocalZone().getNewValue().getValue()).append("]");
+                System.err.append("\n");
+
+                for (Map.Entry<ImageDataKey, ChangeTrackingProperty<String>> property : updateItem.getImageFile().getProperties().entrySet()) {
+                    System.err.println("PROP " + property.getKey() + " = " + property.getValue().getOriginalValue().getValue());
+                }
+
+                System.err.flush();
 
             }
 
