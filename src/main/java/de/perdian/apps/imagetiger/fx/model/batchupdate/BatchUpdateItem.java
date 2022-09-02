@@ -63,6 +63,14 @@ public class BatchUpdateItem {
 
     }
 
+    public void resetAllValues() {
+        this.getFileName().resetValue(this.getImageFile().getFileName().getOriginalValue().getValue());
+        this.getFileNameWithoutExtension().resetValue(this.getImageFile().getFileNameWithoutExtension().getOriginalValue().getValue());
+        this.getFileExtension().resetValue(this.getImageFile().getFileExtension().getOriginalValue().getValue());
+        this.getFileDateLocalString().resetValue(this.getImageFile().getFileDateLocalString().getOriginalValue().getValue());
+        this.getFileDateLocalZone().resetValue(this.getImageFile().getFileDateLocalZone().getOriginalValue().getValue());
+    }
+
     public ImageFile getImageFile() {
         return this.imageFile;
     }

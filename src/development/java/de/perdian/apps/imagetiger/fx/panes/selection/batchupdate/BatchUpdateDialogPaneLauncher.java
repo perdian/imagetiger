@@ -17,11 +17,10 @@ package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import java.io.File;
 
-import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
+import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateSettings;
 import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.application.Application;
-import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -38,24 +37,21 @@ public class BatchUpdateDialogPaneLauncher {
 
     public static class BatchUpdateDialogPaneLauncherApplication extends Application {
 
-        private ImageTigerPreferences preferences = null;
-
-        @Override
-        public void init() throws Exception {
-            this.setPreferences(ImageTigerPreferences.createFromUserHome());
-        }
-
         @Override
         public void start(Stage primaryStage) throws Exception {
 
             JobExecutor jobExecutor = new JobExecutor();
             Selection selection = new Selection(jobExecutor);
+            selection.updateSelectedDirectory(new File(System.getProperty("user.home"), "Downloads/images"), true);
 
-            ObjectProperty<File> directoryProperty = this.getPreferences().createFileProperty("selectedDirectory", new File(System.getProperty("user.home")));
-            File directory = directoryProperty.getValue().exists() ? directoryProperty.getValue() : new File(System.getProperty("user.home"));
-            selection.updateSelectedDirectory(directory, true);
+            BatchUpdateSettings settings = new BatchUpdateSettings();
+            settings.getOriginalFileNamePattern().setValue("IMG_(?<plainName>.*)");
+            settings.getNewFileName().setValue("#{counter} #{file.name}");
+            settings.getNewFileExtension().setValue("#{lowercase(file.extension)}");
+            settings.getNewFileDateLocalString().setValue("#{file.properties['datetime']}");
+            settings.getNewFileDateLocalZone().setValue("#{file.properties['datetime_zone']}");
 
-            BatchUpdateDialogPane primaryPane = new BatchUpdateDialogPane(selection, jobExecutor);
+            BatchUpdateDialogPane primaryPane = new BatchUpdateDialogPane(settings, selection, jobExecutor);
             primaryPane.setPadding(new Insets(10, 10, 10, 10));
             primaryPane.setPrefSize(1600, 1200);
 
@@ -65,13 +61,6 @@ public class BatchUpdateDialogPaneLauncher {
             primaryStage.setOnCloseRequest(event -> System.exit(0));
             primaryStage.show();
 
-        }
-
-        private ImageTigerPreferences getPreferences() {
-            return this.preferences;
-        }
-        private void setPreferences(ImageTigerPreferences preferences) {
-            this.preferences = preferences;
         }
 
     }

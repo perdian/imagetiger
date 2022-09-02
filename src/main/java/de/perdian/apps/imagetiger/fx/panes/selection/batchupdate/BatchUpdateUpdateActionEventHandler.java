@@ -27,15 +27,15 @@ import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-class BatchUpdateExecuteActionEventHandler implements EventHandler<ActionEvent> {
+public class BatchUpdateUpdateActionEventHandler implements EventHandler<ActionEvent> {
 
-    private static final Logger log = LoggerFactory.getLogger(BatchUpdateExecuteActionEventHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(BatchUpdateUpdateActionEventHandler.class);
 
     private List<BatchUpdateItem> items = null;
     private BatchUpdateSettings settings = null;
     private JobExecutor jobExecutor = null;
 
-    BatchUpdateExecuteActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+    public BatchUpdateUpdateActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
         this.setItems(items);
         this.setSettings(settings);
         this.setJobExecutor(jobExecutor);

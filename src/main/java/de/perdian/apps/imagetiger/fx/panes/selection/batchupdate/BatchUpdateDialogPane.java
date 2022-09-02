@@ -30,12 +30,10 @@ import javafx.scene.layout.Priority;
 
 class BatchUpdateDialogPane extends GridPane {
 
-    BatchUpdateDialogPane(Selection selection, JobExecutor jobExecutor) {
+    BatchUpdateDialogPane(BatchUpdateSettings settings, Selection selection, JobExecutor jobExecutor) {
 
         List<BatchUpdateItem> items = selection.getAvailableImageFiles().stream().map(BatchUpdateItem::new).toList();
         ObservableList<BatchUpdateItem> observableItems = FXCollections.observableArrayList(items);
-
-        BatchUpdateSettings settings = new BatchUpdateSettings();
 
         BatchUpdateSettingsPane settingsPane = new BatchUpdateSettingsPane(settings);
         settingsPane.setPadding(new Insets(10, 10, 10, 10));

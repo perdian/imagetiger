@@ -35,15 +35,20 @@ public class JobExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
     private List<JobListener> listeners = new CopyOnWriteArrayList<>();
-    private ExecutorService executor = Executors.newCachedThreadPool();
+    private ExecutorService executor = null;
     private AtomicLong jobCounter = new AtomicLong();
     private JobContextImpl currentJobContext = null;
     private BooleanProperty busy = null;
 
     public JobExecutor() {
+        this(Executors.newCachedThreadPool());
+    }
+
+    public JobExecutor(ExecutorService executorService) {
         BooleanProperty busy = new SimpleBooleanProperty();
         this.addListener(new UpdateBusyWhileJobRunningJobListener(busy));
         this.setBusy(busy);
+        this.setExecutor(executorService);
     }
 
     /**

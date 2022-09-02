@@ -90,20 +90,14 @@ class DefaultImageFile implements ImageFile {
         ChangeTrackingProperty<String> fileDateLocalAsStringProperty = new ChangeTrackingProperty<>(ImageTigerConstants.DATE_TIME_FORMATTER.format(fileDateLocal));
         fileDateLocalAsStringProperty.getNewValue().addListener((o, oldValue, newValue) -> {
             try {
-                ZoneId newZoneId = ZoneId.of(fileDateLocalZone.getNewValue().getValue());
-                LocalDateTime newFileDateLocal = LocalDateTime.parse(newValue, ImageTigerConstants.DATE_TIME_FORMATTER);
-                Instant newFileDate = newFileDateLocal.atZone(newZoneId).toInstant();
-                fileDateProperty.getNewValue().setValue(newFileDate);
+                fileDateProperty.getNewValue().setValue(this.parseToInstant(newValue, fileDateLocalZone.getNewValue().getValue()));
             } catch (Exception e) {
                 log.debug("Invalid new local date: {}", newValue, e);
             }
         });
         fileDateLocalZone.getNewValue().addListener((o, oldValue, newValue) -> {
             try {
-                ZoneId newZoneId = ZoneId.of(newValue);
-                LocalDateTime newFileDateLocal = LocalDateTime.parse(fileDateLocalAsStringProperty.getNewValue().getValue(), ImageTigerConstants.DATE_TIME_FORMATTER);
-                Instant newFileDate = newFileDateLocal.atZone(newZoneId).toInstant();
-                fileDateProperty.getNewValue().setValue(newFileDate);
+                fileDateProperty.getNewValue().setValue(this.parseToInstant(fileDateLocalAsStringProperty.getNewValue().getValue(), newValue));
             } catch (Exception e) {
                 log.debug("Invalid new local date zone: {}", newValue, e);
             }
@@ -146,18 +140,23 @@ class DefaultImageFile implements ImageFile {
 
     }
 
+    private Instant parseToInstant(String dateValue, String zoneValue) {
+        ZoneId newZoneId = ZoneId.of(zoneValue);
+        LocalDateTime newFileDateLocal = LocalDateTime.parse(dateValue, ImageTigerConstants.DATE_TIME_FORMATTER);
+        return newFileDateLocal.atZone(newZoneId).toInstant();
+    }
+
     @Override
     public synchronized boolean updateOsFile() throws IOException {
         boolean fileUpdated = false;
-        File osFile = this.getOsFile();
-        Instant osFileDate = Files.getLastModifiedTime(osFile.toPath()).toInstant();
+        Instant osFileDate = Files.getLastModifiedTime(this.getOsFile().toPath()).toInstant();
         if (this.getFileName().getDirty().get()) {
             String newFileName = this.getFileName().getNewValue().getValue();
             int newFileExtensionSeparatorIndex = newFileName.lastIndexOf(".");
             String newFileNameWithoutExtension = newFileExtensionSeparatorIndex < 0 ? "" : newFileName.substring(0, newFileExtensionSeparatorIndex);
             String newFileExtension = newFileExtensionSeparatorIndex < 0 ? "" : newFileName.substring(newFileExtensionSeparatorIndex + 1);
-            File newOsFile = new File(osFile.getParentFile(), newFileName);
-            osFile.renameTo(newOsFile);
+            File newOsFile = new File(this.getOsFile().getParentFile(), newFileName);
+            this.getOsFile().renameTo(newOsFile);
             this.getFileNameWithoutExtension().resetValue(newFileNameWithoutExtension);
             this.getFileExtension().resetValue(newFileExtension);
             this.getFileName().resetValue(newFileName);
@@ -166,11 +165,10 @@ class DefaultImageFile implements ImageFile {
         }
         Instant newFileDate = this.getFileDate().getNewValue().getValue();
         if (!newFileDate.equals(osFileDate)) {
-            osFile.setLastModified(newFileDate.toEpochMilli());
+            this.getOsFile().setLastModified(newFileDate.toEpochMilli());
             fileUpdated = true;
             this.getFileDate().resetValue(newFileDate);
         }
-        this.getFileDate().resetValue(newFileDate);
         return fileUpdated;
     }
 

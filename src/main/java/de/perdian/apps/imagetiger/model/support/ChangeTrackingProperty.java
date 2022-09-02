@@ -18,7 +18,6 @@ package de.perdian.apps.imagetiger.model.support;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -47,11 +46,13 @@ public class ChangeTrackingProperty<T> {
         return toStringBuilder.toString();
     }
 
+    public void resetValue() {
+        this.resetValue(this.getOriginalValue().getValue());
+    }
+
     public void resetValue(T value) {
-        Platform.runLater(() -> {
-            this.getOriginalValueInternal().setValue(value);
-            this.getNewValueInternal().setValue(value);
-        });
+        this.getOriginalValueInternal().setValue(value);
+        this.getNewValueInternal().setValue(value);
     }
 
     public ReadOnlyObjectProperty<T> getOriginalValue() {

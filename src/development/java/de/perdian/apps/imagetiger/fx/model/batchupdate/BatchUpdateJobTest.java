@@ -20,12 +20,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateSaveActionEventHandler;
+import de.perdian.apps.imagetiger.fx.support.jobs.Job;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobContext;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
+import de.perdian.apps.imagetiger.fx.support.jobs.JobListener;
 import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageFileParser;
@@ -81,12 +88,24 @@ public class BatchUpdateJobTest {
                 System.err.append("\n");
 
                 for (Map.Entry<ImageDataKey, ChangeTrackingProperty<String>> property : updateItem.getImageFile().getProperties().entrySet()) {
-                    System.err.println("PROP " + property.getKey() + " = " + property.getValue().getOriginalValue().getValue());
+                    System.err.println("         - PROP " + property.getKey() + " = " + property.getValue().getOriginalValue().getValue());
                 }
 
                 System.err.flush();
 
             }
+
+            log.info("Updating file values");
+            ExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            JobExecutor jobExecutor = new JobExecutor(executorService);
+            jobExecutor.addListener(new JobListener() {
+                @Override public void jobProgress(Job job, String progressMessage, Integer progressStep, Integer totalProgressSteps) {
+                    log.debug("Job [" + progressStep + "/" + totalProgressSteps + "] " + progressMessage);
+                }
+            });
+            new BatchUpdateSaveActionEventHandler(updateItems, jobExecutor).handle(null);
+            executorService.shutdown();
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
         } catch (Throwable e) {
             log.error("Cannot execute batch update", e);
