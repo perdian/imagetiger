@@ -18,6 +18,7 @@ package de.perdian.apps.imagetiger.fx.panes.selection.thumbnails;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignF;
 
+import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateDialog;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
@@ -33,19 +34,20 @@ class ThumbnailsPaneContextMenuEventHandler implements EventHandler<ContextMenuE
     private Node parentNode = null;
     private Selection selection = null;
     private JobExecutor jobExecutor = null;
+    private ImageTigerPreferences preferences = null;
 
-    ThumbnailsPaneContextMenuEventHandler(Node parentNode, Selection selection, JobExecutor jobExecutor) {
+    ThumbnailsPaneContextMenuEventHandler(Node parentNode, Selection selection, JobExecutor jobExecutor, ImageTigerPreferences preferences) {
         this.setParentNode(parentNode);
         this.setSelection(selection);
         this.setJobExecutor(jobExecutor);
-
+        this.setPreferences(preferences);
     }
 
     @Override
     public void handle(ContextMenuEvent event) {
 
         MenuItem batchUpdateMenuItem = new MenuItem("Batch update", new FontIcon(MaterialDesignF.FOLDER_TABLE_OUTLINE));
-        batchUpdateMenuItem.setOnAction(e -> new BatchUpdateDialog(this.getParentNode().getScene().getWindow(), this.getSelection(), this.getJobExecutor()).show());
+        batchUpdateMenuItem.setOnAction(e -> new BatchUpdateDialog(this.getParentNode().getScene().getWindow(), this.getSelection(), this.getJobExecutor(), this.getPreferences()).show());
 
         Window ownerWindow = this.getParentNode().getScene().getWindow();
         ContextMenu contextMenu = new ContextMenu();
@@ -73,6 +75,13 @@ class ThumbnailsPaneContextMenuEventHandler implements EventHandler<ContextMenuE
     }
     private void setJobExecutor(JobExecutor jobExecutor) {
         this.jobExecutor = jobExecutor;
+    }
+
+    private ImageTigerPreferences getPreferences() {
+        return this.preferences;
+    }
+    private void setPreferences(ImageTigerPreferences preferences) {
+        this.preferences = preferences;
     }
 
 }

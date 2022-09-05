@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
+package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions;
 
 import java.util.List;
 
@@ -27,15 +27,15 @@ import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-public class BatchUpdateUpdateActionEventHandler implements EventHandler<ActionEvent> {
+public class BatchUpdateComputeActionEventHandler implements EventHandler<ActionEvent> {
 
-    private static final Logger log = LoggerFactory.getLogger(BatchUpdateUpdateActionEventHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(BatchUpdateComputeActionEventHandler.class);
 
     private List<BatchUpdateItem> items = null;
     private BatchUpdateSettings settings = null;
     private JobExecutor jobExecutor = null;
 
-    public BatchUpdateUpdateActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+    public BatchUpdateComputeActionEventHandler(List<BatchUpdateItem> items, BatchUpdateSettings settings, JobExecutor jobExecutor) {
         this.setItems(items);
         this.setSettings(settings);
         this.setJobExecutor(jobExecutor);

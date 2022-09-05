@@ -16,36 +16,43 @@
 package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
 
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignE;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignR;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignU;
 
 import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
 import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateSettings;
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions.BatchUpdateComputeActionEventHandler;
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions.BatchUpdateResetActionEventHandler;
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions.BatchUpdateTransferActionEventHandler;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.ButtonBar;
 
-class BatchUpdateActionsPane extends FlowPane {
+class BatchUpdateActionsPane extends ButtonBar {
 
-    BatchUpdateActionsPane(ObservableList<BatchUpdateItem> allItems, ObservableList<BatchUpdateItem> selectedItems, BatchUpdateSettings settings, JobExecutor jobExecutor) {
+    BatchUpdateActionsPane(ObservableList<BatchUpdateItem> allItems, ObservableList<BatchUpdateItem> selectedItems, BatchUpdateSettings settings, JobExecutor jobExecutor, ObjectProperty<EventHandler<ActionEvent>> onTransferProperty) {
 
-        Button updateButton = new Button("Update file properties", new FontIcon(MaterialDesignU.UPDATE));
-        updateButton.setOnAction(new BatchUpdateUpdateActionEventHandler(selectedItems, settings, jobExecutor));
-        updateButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(selectedItems), Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy())));
+        Button computeButton = new Button("Compute new properties", new FontIcon(MaterialDesignU.UPDATE));
+        computeButton.setOnAction(new BatchUpdateComputeActionEventHandler(selectedItems, settings, jobExecutor));
+        computeButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(selectedItems), Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy())));
+        ButtonBar.setButtonData(computeButton, ButtonData.LEFT);
 
-        Button resetButton = new Button("Reset file properties", new FontIcon(MaterialDesignR.RELOAD));
+        Button resetButton = new Button("Reset properties", new FontIcon(MaterialDesignR.RELOAD));
         resetButton.setOnAction(new BatchUpdateResetActionEventHandler(selectedItems, jobExecutor));
         resetButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(selectedItems), Bindings.or(Bindings.not(settings.getReady()), jobExecutor.getBusy())));
+        ButtonBar.setButtonData(resetButton, ButtonData.LEFT);
 
-        Button saveButton = new Button("Save changed files", new FontIcon(MaterialDesignC.CONTENT_SAVE));
-        saveButton.setOnAction(new BatchUpdateSaveActionEventHandler(allItems, jobExecutor));
-        saveButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(allItems), jobExecutor.getBusy()));
+        Button transferButton = new Button("Update image files", new FontIcon(MaterialDesignE.EXIT_TO_APP));
+        transferButton.setOnAction(new BatchUpdateTransferActionEventHandler(allItems, jobExecutor, onTransferProperty));
+        transferButton.disableProperty().bind(Bindings.or(Bindings.isEmpty(allItems), jobExecutor.getBusy()));
 
-        this.setHgap(5);
-        this.getChildren().addAll(updateButton, resetButton, saveButton);
+        this.getButtons().addAll(computeButton, resetButton, transferButton);
 
     }
 

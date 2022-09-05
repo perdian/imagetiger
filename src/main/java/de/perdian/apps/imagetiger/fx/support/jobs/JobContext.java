@@ -15,16 +15,26 @@
  */
 package de.perdian.apps.imagetiger.fx.support.jobs;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public interface JobContext {
 
     public static final JobContext NULL_CONTEXT = new JobContext() {
 
+        private static final Logger log = LoggerFactory.getLogger(JobContext.class);
+
         @Override
         public void updateProgress(String message, Integer step, Integer totalSteps) {
+            this.updateProgress(message);
         }
 
         @Override
         public void updateProgress(String message) {
+            if (StringUtils.isNotEmpty(message)) {
+                log.info(message);
+            }
         }
 
         @Override
@@ -35,6 +45,11 @@ public interface JobContext {
         @Override
         public boolean isActive() {
             return false;
+        }
+
+        @Override
+        public Throwable getError() {
+            return null;
         }
 
     };
@@ -72,5 +87,10 @@ public interface JobContext {
      * Checks if the job has been cancelled
      */
     public boolean isCancelled();
+
+    /**
+     * Gets an error that occured during the job execution
+     */
+    public Throwable getError();
 
 }

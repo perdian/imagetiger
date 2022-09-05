@@ -80,7 +80,7 @@ public class ThumbnailsPane extends GridPane {
         this.add(separatorPane, 0, 1, 1, 1);
         this.add(settingsPane, 0, 2, 1, 1);
 
-        this.setOnContextMenuRequested(new ThumbnailsPaneContextMenuEventHandler(this, selection, jobExecutor));
+        this.setOnContextMenuRequested(new ThumbnailsPaneContextMenuEventHandler(this, selection, jobExecutor, preferences));
 
         Executor thumnailsScalingExecutorTarget = Executors.newFixedThreadPool(5);
         selection.getAvailableImageFiles().addListener((ListChangeListener.Change<? extends ImageFile> change) -> {

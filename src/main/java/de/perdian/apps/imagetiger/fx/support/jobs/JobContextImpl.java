@@ -25,6 +25,7 @@ class JobContextImpl implements JobContext {
     private List<JobListener> listeners = null;
     private long jobIndex = 0;
     private AtomicLong jobCounter = null;
+    private Throwable error = null;
 
     JobContextImpl(Job job, AtomicLong jobCounter, List<JobListener> listeners) {
         this.setJob(job);
@@ -56,6 +57,14 @@ class JobContextImpl implements JobContext {
     }
     void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+    @Override
+    public Throwable getError() {
+        return this.error;
+    }
+    void setError(Throwable error) {
+        this.error = error;
     }
 
     Job getJob() {

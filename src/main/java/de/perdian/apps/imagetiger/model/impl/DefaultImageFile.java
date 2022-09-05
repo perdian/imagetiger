@@ -40,6 +40,7 @@ import de.perdian.apps.imagetiger.model.ImageDataKey;
 import de.perdian.apps.imagetiger.model.ImageFile;
 import de.perdian.apps.imagetiger.model.ImageTigerConstants;
 import de.perdian.apps.imagetiger.model.support.ChangeTrackingProperty;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -157,9 +158,11 @@ class DefaultImageFile implements ImageFile {
             String newFileExtension = newFileExtensionSeparatorIndex < 0 ? "" : newFileName.substring(newFileExtensionSeparatorIndex + 1);
             File newOsFile = new File(this.getOsFile().getParentFile(), newFileName);
             this.getOsFile().renameTo(newOsFile);
-            this.getFileNameWithoutExtension().resetValue(newFileNameWithoutExtension);
-            this.getFileExtension().resetValue(newFileExtension);
-            this.getFileName().resetValue(newFileName);
+            Platform.runLater(() -> {
+                this.getFileNameWithoutExtension().resetValue(newFileNameWithoutExtension);
+                this.getFileExtension().resetValue(newFileExtension);
+                this.getFileName().resetValue(newFileName);
+            });
             fileUpdated = true;
             this.setOsFile(newOsFile);
         }
@@ -167,7 +170,9 @@ class DefaultImageFile implements ImageFile {
         if (!newFileDate.equals(osFileDate)) {
             this.getOsFile().setLastModified(newFileDate.toEpochMilli());
             fileUpdated = true;
-            this.getFileDate().resetValue(newFileDate);
+            Platform.runLater(() -> {
+                this.getFileDate().resetValue(newFileDate);
+            });
         }
         return fileUpdated;
     }

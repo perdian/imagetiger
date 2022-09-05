@@ -21,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import de.perdian.apps.imagetiger.fx.ImageTigerPreferences;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -36,6 +37,16 @@ public class BatchUpdateSettings {
     private StringProperty newFileDateLocalZone = null;
     private ObservableBooleanValue ready = null;
     private List<ChangeListener<String>> changeListeners = null;
+
+    public BatchUpdateSettings(ImageTigerPreferences preferences) {
+        this();
+
+        this.getOriginalFileNamePattern().bindBidirectional(preferences.createProperty("BatchUpdateSettings.originalFileNamePattern", null));
+        this.getNewFileName().bindBidirectional(preferences.createProperty("BatchUpdateSettings.newFileName", null));
+        this.getNewFileExtension().bindBidirectional(preferences.createProperty("BatchUpdateSettings.newFileExtension", "#{lowercase(file.extension)}"));
+        this.getNewFileDateLocalString().bindBidirectional(preferences.createProperty("BatchUpdateSettings.newFileDateLocalString", null));
+        this.getNewFileDateLocalZone().bindBidirectional(preferences.createProperty("BatchUpdateSettings.newFileDateLocalZone", null));
+    }
 
     public BatchUpdateSettings() {
 

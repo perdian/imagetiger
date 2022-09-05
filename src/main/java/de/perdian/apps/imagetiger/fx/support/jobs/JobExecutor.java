@@ -74,6 +74,9 @@ public class JobExecutor {
             this.getListeners().forEach(listener -> listener.jobStarted(job));
             try {
                 job.execute(jobContext);
+            } catch (Throwable e) {
+                log.warn("Error occured while executing job: {}", job, e);
+                jobContext.setError(e);
             } finally {
 
                 this.getListeners().forEach(listener -> listener.jobCompleted(job, !jobContext.isActive()));

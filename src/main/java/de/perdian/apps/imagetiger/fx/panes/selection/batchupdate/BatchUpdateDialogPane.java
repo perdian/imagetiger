@@ -21,14 +21,20 @@ import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
 import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateSettings;
 import de.perdian.apps.imagetiger.fx.model.selection.Selection;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
 class BatchUpdateDialogPane extends GridPane {
+
+    private ObjectProperty<EventHandler<ActionEvent>> onTransferProperty = new SimpleObjectProperty<>(event -> {});
 
     BatchUpdateDialogPane(BatchUpdateSettings settings, Selection selection, JobExecutor jobExecutor) {
 
@@ -49,7 +55,7 @@ class BatchUpdateDialogPane extends GridPane {
         GridPane.setHgrow(itemsTableView, Priority.ALWAYS);
         GridPane.setVgrow(itemsTableView, Priority.ALWAYS);
 
-        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(observableItems, itemsTableView.getSelectionModel().getSelectedItems(), settings, jobExecutor);
+        BatchUpdateActionsPane actionsPane = new BatchUpdateActionsPane(observableItems, observableItems, settings, jobExecutor, this.onTransferProperty);
         actionsPane.setPadding(new Insets(10, 10, 10, 10));
         actionsPane.disableProperty().bind(selection.getBusy());
         TitledPane actionsTitledPane = new TitledPane("Actions", actionsPane);
@@ -64,6 +70,13 @@ class BatchUpdateDialogPane extends GridPane {
         this.setHgap(10);
         this.setVgap(10);
 
+    }
+
+    EventHandler<ActionEvent> getOnTransfer() {
+        return this.onTransferProperty.getValue();
+    }
+    void setOnTransfer(EventHandler<ActionEvent> onTransfer) {
+        this.onTransferProperty.setValue(onTransfer);
     }
 
 }

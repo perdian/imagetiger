@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.BatchUpdateSaveActionEventHandler;
+import de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions.BatchUpdateTransferActionEventHandler;
 import de.perdian.apps.imagetiger.fx.support.jobs.Job;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobContext;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
@@ -63,7 +63,7 @@ public class BatchUpdateJobTest {
 
             List<BatchUpdateItem> updateItems = imageFiles.stream().map(BatchUpdateItem::new).toList();
             BatchUpdateJob updateJob = new BatchUpdateJob(updateItems, updateSettings);
-            updateJob.execute(new JobContextImpl());
+            updateJob.execute(JobContext.NULL_CONTEXT);
 
             System.err.println("\nSettings FileDateLocalString: " + updateSettings.getNewFileDateLocalString().getValue());
             System.err.println("Settings FileDateLocalZone:   " + updateSettings.getNewFileDateLocalZone().getValue());
@@ -103,7 +103,7 @@ public class BatchUpdateJobTest {
                     log.debug("Job [" + progressStep + "/" + totalProgressSteps + "] " + progressMessage);
                 }
             });
-            new BatchUpdateSaveActionEventHandler(updateItems, jobExecutor).handle(null);
+            new BatchUpdateTransferActionEventHandler(updateItems, jobExecutor, null).handle(null);
             executorService.shutdown();
             executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
@@ -129,30 +129,6 @@ public class BatchUpdateJobTest {
         } catch (IOException e) {
             throw new RuntimeException("Cannot load image files from directory: " + sourceDirectory, e);
         }
-    }
-
-    private static final class JobContextImpl implements JobContext {
-
-        @Override
-        public void updateProgress(String message) {
-            this.updateProgress(message, null, null);
-        }
-
-        @Override
-        public void updateProgress(String message, Integer step, Integer totalSteps) {
-            log.info(message);
-        }
-
-        @Override
-        public boolean isActive() {
-            return true;
-        }
-
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
-
     }
 
 }

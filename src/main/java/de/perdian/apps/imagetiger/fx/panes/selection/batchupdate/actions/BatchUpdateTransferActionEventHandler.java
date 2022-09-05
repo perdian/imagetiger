@@ -13,31 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate;
+package de.perdian.apps.imagetiger.fx.panes.selection.batchupdate.actions;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.perdian.apps.imagetiger.fx.model.batchupdate.BatchUpdateItem;
 import de.perdian.apps.imagetiger.fx.support.jobs.JobExecutor;
 import de.perdian.apps.imagetiger.model.ImageFile;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-public class BatchUpdateSaveActionEventHandler implements EventHandler<ActionEvent> {
-
-    private static final Logger log = LoggerFactory.getLogger(BatchUpdateSaveActionEventHandler.class);
+public class BatchUpdateTransferActionEventHandler implements EventHandler<ActionEvent> {
 
     private List<BatchUpdateItem> items = null;
     private JobExecutor jobExecutor = null;
+    private ObjectProperty<EventHandler<ActionEvent>> onTransferProperty = null;
 
-    public BatchUpdateSaveActionEventHandler(List<BatchUpdateItem> items, JobExecutor jobExecutor) {
+    public BatchUpdateTransferActionEventHandler(List<BatchUpdateItem> items, JobExecutor jobExecutor, ObjectProperty<EventHandler<ActionEvent>> onTransferProperty) {
         this.setItems(items);
         this.setJobExecutor(jobExecutor);
+        this.setOnTransferProperty(onTransferProperty);
     }
 
     @Override
@@ -52,40 +51,32 @@ public class BatchUpdateSaveActionEventHandler implements EventHandler<ActionEve
                     this.saveItem(dirtyItem);
                 }
             }
+            this.getOnTransferProperty().getValue().handle(event);
         });
-
     }
 
     private void saveItem(BatchUpdateItem item) {
-        try {
 
-            ImageFile imageFile = item.getImageFile();
+        ImageFile imageFile = item.getImageFile();
 
-            String newFileDateValue = item.getFileDateLocalString().getNewValue().getValue();
-            if (StringUtils.isNotEmpty(newFileDateValue)) {
-                imageFile.getFileDateLocalString().getNewValue().setValue(newFileDateValue);
-            }
-            String newFileDateZone = item.getFileDateLocalZone().getNewValue().getValue();
-            if (StringUtils.isNotEmpty(newFileDateZone)) {
-                imageFile.getFileDateLocalZone().getNewValue().setValue(newFileDateZone);
-            }
-
-            String newFileNameWithoutExtension = item.getFileNameWithoutExtension().getNewValue().getValue();
-            if (StringUtils.isNotEmpty(newFileNameWithoutExtension)) {
-                imageFile.getFileNameWithoutExtension().getNewValue().setValue(newFileNameWithoutExtension);
-            }
-            String newFileExtension = item.getFileExtension().getNewValue().getValue();
-            if (StringUtils.isNotEmpty(newFileExtension)) {
-                imageFile.getFileExtension().getNewValue().setValue(newFileExtension);
-            }
-
-            imageFile.updateOsFile();
-
-            item.resetAllValues();
-
-        } catch (Exception e) {
-            log.error("Cannot update image file at: {}", item.getImageFile().getFileName().getOriginalValue().getValue(), e);
+        String newFileDateValue = item.getFileDateLocalString().getNewValue().getValue();
+        if (StringUtils.isNotEmpty(newFileDateValue)) {
+            imageFile.getFileDateLocalString().getNewValue().setValue(newFileDateValue);
         }
+        String newFileDateZone = item.getFileDateLocalZone().getNewValue().getValue();
+        if (StringUtils.isNotEmpty(newFileDateZone)) {
+            imageFile.getFileDateLocalZone().getNewValue().setValue(newFileDateZone);
+        }
+
+        String newFileNameWithoutExtension = item.getFileNameWithoutExtension().getNewValue().getValue();
+        if (StringUtils.isNotEmpty(newFileNameWithoutExtension)) {
+            imageFile.getFileNameWithoutExtension().getNewValue().setValue(newFileNameWithoutExtension);
+        }
+        String newFileExtension = item.getFileExtension().getNewValue().getValue();
+        if (StringUtils.isNotEmpty(newFileExtension)) {
+            imageFile.getFileExtension().getNewValue().setValue(newFileExtension);
+        }
+
     }
 
     private List<BatchUpdateItem> getItems() {
@@ -100,6 +91,13 @@ public class BatchUpdateSaveActionEventHandler implements EventHandler<ActionEve
     }
     private void setJobExecutor(JobExecutor jobExecutor) {
         this.jobExecutor = jobExecutor;
+    }
+
+    private ObjectProperty<EventHandler<ActionEvent>> getOnTransferProperty() {
+        return this.onTransferProperty;
+    }
+    private void setOnTransferProperty(ObjectProperty<EventHandler<ActionEvent>> onTransferProperty) {
+        this.onTransferProperty = onTransferProperty;
     }
 
 }
